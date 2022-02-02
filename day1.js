@@ -73,7 +73,7 @@ function setup() {
 
 
     // set attackLevel, releaseLevel
-    envelope.setRange(0.5, 0);
+    envelope.setRange(0.1, 0);
     osc.start();
     osc2.start();
     osc3.start();
