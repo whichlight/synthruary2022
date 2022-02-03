@@ -32,6 +32,14 @@ function touchStarted() {
         contextStarted =true;
         let a = select('#instructions');
         a.remove();
+
+
+        envelope.setRange(0.1, 0);
+        osc2.freq(midiToFreq(bnote));
+        osc3.freq(midiToFreq(mnote));
+        osc.start();
+        osc2.start();
+        osc3.start();
     }
 
     if(contextStarted){
@@ -73,12 +81,7 @@ function setup() {
 
 
     // set attackLevel, releaseLevel
-    envelope.setRange(0.1, 0);
-    osc.start();
-    osc2.start();
-    osc3.start();
-    osc2.freq(midiToFreq(bnote));
-    osc3.freq(midiToFreq(mnote));
+   
 
     fft = new p5.FFT();
     drawTriangle();
