@@ -18,7 +18,6 @@ let visIndex = 0;
 function touchStarted() {
     if (!contextStarted) {
         Tone.start();
-        setupSynths();
         let a = select('#instructions');
         a.remove();
         contextStarted = true;
@@ -57,9 +56,11 @@ function setup() {
     h = windowHeight;
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
+    setupSynths();
     background(240, 100, 100, 100);
     playButton();
-    rectMode(CENTER);
+   
+
 }
 
 
