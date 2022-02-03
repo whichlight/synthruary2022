@@ -4,7 +4,6 @@
  * 
  * <3 whichlight 
  * 
- * ref: https://github.com/Tonejs/Tone.js/wiki/Arpeggiator
  * 
  */
 
