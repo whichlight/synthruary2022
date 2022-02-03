@@ -38,6 +38,8 @@ function setup() {
     h = windowHeight;
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
+    background(60, 30, 100,100);
+    drawTriangle();
 }
 
 
@@ -135,4 +137,24 @@ function updateSynth(){
         });
     
 }
+
+function drawTriangle(){
+    push();
+    translate(width * 0.5, height * 0.5);
+    fill(180,100,100);
+    noStroke();
+    polygon(0, 0, 50, 3);
+    pop(); 
+}
+
+function polygon(x, y, radius, npoints) {
+    let angle = TWO_PI / npoints;
+    beginShape();
+    for (let a = 0; a < TWO_PI; a += angle) {
+      let sx = x + cos(a) * radius;
+      let sy = y + sin(a) * radius;
+      vertex(sx, sy);
+    }
+    endShape(CLOSE);
+  }
 
