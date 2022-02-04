@@ -14,8 +14,11 @@ let clips = [];
 let visIndex = 0; 
 
 
+function touchStarted(){
+    return false; 
+}
 
-function touchStarted() {
+function touchEnded() {
     if (!contextStarted) {
         let a = select('#instructions');
         a.remove();
