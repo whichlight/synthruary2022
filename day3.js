@@ -17,14 +17,13 @@ let visIndex = 0;
 
 function touchStarted() {
     if (!contextStarted) {
-        Tone.start();
         let a = select('#instructions');
         a.remove();
         contextStarted = true;
         background(240, 100, 100);
+        Tone.start();
 
     }
-    updateSynth();
     return false;
 }
 
@@ -65,22 +64,26 @@ function setup() {
 
 
 function draw() {
+    if(contextStarted){
+        for (clip of clips){
+            if(clip.player.state == "stopped"){
+                clip.player.start();
+            }
+        }
+    }
+
     if(!mouseIsPressed && contextStarted){
         for(clip of clips){
             clip.player.mute = true;
             clip.player.seek(0);
         }
         background(240, 100, 100,0.01);
-
     }
-
-    let x = mouseX; 
-    let y = mouseY; 
 
     if(contextStarted && mouseIsPressed){
-        updateVis(x,y);
+        updateSynth(); 
+        updateVis();
     }
-
 
 }
 
@@ -107,18 +110,10 @@ class Clip{
     }
 
     start(){
-        this.player.autostart = true;
         this.player.loop = true; 
     }
 }
 
-
-
-function mouseDragged() {
-    if (contextStarted) {
-        updateSynth();
-    }
-}
 
 function updateSynth() {
 
@@ -126,8 +121,8 @@ function updateSynth() {
     let y = mouseY; 
     let p = map(x,0,w, -10,10); 
     let f = map(y, h, 0, 0, 0.8); 
-
     for(clip of clips){
+       
         clip.pitchShift.pitch = p;    
         clip.delay.feedback.value = f; 
         
@@ -136,13 +131,12 @@ function updateSynth() {
         }
 
     }
-
-  
-
 }
 
 
-function updateVis(x,y){
+function updateVis(){
+    let x = mouseX; 
+    let y = mouseY; 
     let num = floor(map(y,0,h,10,1));
 
 
