@@ -19,7 +19,9 @@ const root = 70;
  * synth start boilerplate 
  *************************/
 function touchStarted() {
-    synthPressed(); 
+    if(contextStarted){
+        synthPressed(); 
+    }
     return false;
 }
 
