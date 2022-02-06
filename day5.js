@@ -8,7 +8,7 @@
  */
 
 let synths = [];
-let contextStarted = true;
+let contextStarted;
 let w, h;
 const root = 70;
 const glen = 0.5; 
@@ -27,7 +27,7 @@ function touchEnded() {
         Tone.start();
         let a = select('#instructions');
         a.remove();
-        background(240, 100, 100);
+        background(280, 100, 50, 100);
         contextStarted = true;
     }
     noteClicked(); 
@@ -90,29 +90,31 @@ function noteClicked(){
  * synthy things 
  *************************/
 
+ function hexPoints(x, y, radius) {
+    let angle = TWO_PI / 6;
+ 
+    let points = []
+    for (let a = 0; a < TWO_PI; a += angle) {
+        let sx = x + cos(a) * radius;
+        let sy = y + sin(a) * radius;
+        points.push([sx, sy]);
+    }
+    return points; 
+}
+
 function setupSynths() {
     let root = 55;
     let intervals = [0, 3, 5, 7, 10, 12];
     notes = intervals.map((i)=>root+i);
-    let num = 3; 
+    let num = 3;     
 
-    let pos = createVector(2*w/(2*num),h/(2*num)); 
-    synths.push(new Note(notes[0], pos));
+    let hpoints = hexPoints(w/2,h/2,0.4*min(w,h));
+    console.log(hpoints);
 
-    pos = createVector(w - 2*w/(2*num),h/(2*num)); 
-    synths.push(new Note(notes[1], pos));
-
-    pos = createVector(w/(2*num),h/(2*num)+ 1*h/num); 
-    synths.push(new Note(notes[2], pos));
-
-    pos = createVector(w - w/(2*num),h/(2*num)+ 1*h/num); 
-    synths.push(new Note(notes[3], pos));
-
-    pos = createVector(2*w/(2*num),h - h/(2*num)); 
-    synths.push(new Note(notes[4], pos));
-
-    pos = createVector(w - 2*w/(2*num),h - h/(2*num)); 
-    synths.push(new Note(notes[5], pos));
+    notes.forEach((n,i)=>{
+        let pos = createVector(hpoints[i][0], hpoints[i][1]);
+        synths.push(new Note(n, pos));
+    })
 
     group = new Group(synths); 
     
@@ -133,7 +135,7 @@ class Note {
         this.note = note;
         this.pitch = Tone.Frequency(this.note, "midi");
         this.pos = pos;
-        this.r = 100;
+        this.r = min(100, min(w,h)/8);
         this.sat = 100; 
     }
 
