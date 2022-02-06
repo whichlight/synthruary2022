@@ -1,0 +1,6 @@
+*.pem
+render
+node_modules
+notes.txt
+.DS_*
+audio
