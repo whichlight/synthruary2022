@@ -86,7 +86,9 @@ function draw() {
 }
 
 function mouseDragged(){
-    synthPressed(); 
+    if(contextStarted){
+        synthPressed(); 
+    }
 }
 
 function synthPressed(){
