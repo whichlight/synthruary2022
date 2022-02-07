@@ -30,7 +30,6 @@ function touchEnded() {
         Tone.start();
         let a = select('#instructions');
         a.remove();
-        background(280, 100, 50, 100);
         contextStarted = true;
     }
 
@@ -44,7 +43,7 @@ function touchEnded() {
 function playButton() {
     push();
     translate(width * 0.5, height * 0.5);
-    fill(180, 100, 100);
+    fill(180, 0, 100,0.5);
     noStroke();
     polygon(0, 0, 50, 3);
     pop();
@@ -72,7 +71,7 @@ function setup() {
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
     setupSynths();
-    background(280, 100, 50, 100);
+    background(0);
     playButton();
     frameRate(20);
     noStroke();
@@ -80,9 +79,8 @@ function setup() {
 }
 
 function draw() {
-    background(0);
     if (contextStarted) {
-       
+        background(0);
         group.display(); 
     }
 }
