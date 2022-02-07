@@ -198,7 +198,8 @@ class Group{
                 for(let i=0; i<h; i+=10){
                     push();
                     translate(w/2,i);
-                    translate((w/2)*sin(frameCount + i*this.root)+s.offset*j,0);
+                    let val = (w/2)*sin(frameCount + i*this.root)+s.offset*j; 
+                    translate(val,0);
                     fill(0,0,100);
                     rect(0,0,10,10);
                     pop();
