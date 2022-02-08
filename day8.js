@@ -8,11 +8,16 @@
  */
 
 
+
 let synths = [];
 let contextStarted;
 let w, h;
 const root = 100;
-let ctx; 
+let ctx;
+
+let fft;
+let dataArray;
+let bufferLength;
 
 
 /*************************
@@ -32,6 +37,11 @@ function touchEnded() {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         ctx = new AudioContext();
         reverbjs.extend(ctx);
+        fft = ctx.createAnalyser();
+
+        fft.fftSize = 2048;
+        bufferLength = fft.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
 
 
         setupSynths();
@@ -44,7 +54,7 @@ function touchEnded() {
 function playButton() {
     push();
     translate(width * 0.5, height * 0.5);
-    fill(0, 0, 100, 0.8);
+    fill(0, 0, 0, 0.8);
     noStroke();
     polygon(0, 0, 50, 3);
     pop();
@@ -75,27 +85,49 @@ function setup() {
     h = windowHeight;
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
-    background(300, 100, 100);
+    background(60, 100, 100);
     playButton();
     frameRate(30);
     noStroke();
     rectMode(CENTER);
+
 }
 
 function draw() {
     if (contextStarted) {
-        background(300, 100, 100);
+        background(60, 100, 100);
+
+        fft.getByteFrequencyData(dataArray);
+
+        let y = 0;
+        let ystep = h * 1.0 / bufferLength;
+        for (var i = 0; i < (1*bufferLength); i+=2) {
+            let v = dataArray[i] / 128.0;
+            let x = v *100;
+            y = i*ystep;
 
 
+            let c= (200+180*v)%360; 
+            fill(c, 100, 100);
+           // fill((200+90*v)%360, 100, 100);
+            let r = v*(w/2); 
+            ellipse(w/2,h-y-(h/8), r, r/2);
+        }
+
+
+        if (mouseIsPressed) {
+            group.pressed(mouseX, mouseY);
+        }
+
+
+        if (!mouseIsPressed && group.playing) {
+            group.stop();
+        }
 
     }
 
-    if (mouseIsPressed && contextStarted) {
-        group.pressed(mouseX, mouseY);
-    }
-    if (!mouseIsPressed && contextStarted && group.playing) {
-        group.stop();
-    }
+
+
 }
 
 
@@ -113,17 +145,17 @@ class Synth {
         this.filter.frequency.setValueAtTime(1000, ctx.currentTime)
         this.filter.Q.value = 1;
 
-        this.waveshaper = ctx.createWaveShaper(); 
-        this.waveshaper.curve =  makeDistortionCurve(400);
+        this.waveshaper = ctx.createWaveShaper();
+        this.waveshaper.curve = makeDistortionCurve(400);
         this.waveshaper.oversample = '4x';
 
         this.osc = ctx.createOscillator();
         this.osc.frequency.value = freq;
         this.osc.type = "triangle";
 
-        this.osc.connect(this.waveshaper);  
+        this.osc.connect(this.waveshaper);
         this.waveshaper.connect(this.filter);
-        this.filter.connect(this.gain);  
+        this.filter.connect(this.gain);
         this.osc.start();
     }
 
@@ -139,11 +171,11 @@ class Synth {
         this.osc.frequency.linearRampToValueAtTime(freq, ctx.currentTime + 0.001);
     }
 
-    setFilter(freq){
+    setFilter(freq) {
         this.filter.frequency.linearRampToValueAtTime(freq, ctx.currentTime + 0.001);
     }
 
-    connect(out){
+    connect(out) {
         this.gain.connect(out)
     }
 }
@@ -169,46 +201,44 @@ class Group {
         this.compressor.ratio.setValueAtTime(12, ctx.currentTime);
         this.compressor.attack.setValueAtTime(0, ctx.currentTime);
         this.compressor.release.setValueAtTime(0.01, ctx.currentTime);
-        
-        let compressor = this.compressor; 
+
+        let compressor = this.compressor;
 
 
         //trying our different reverbs
-       // var reverbUrl = "http://reverbjs.org/Library/R1NuclearReactorHall.m4a";
-       // var reverbUrl = "http://reverbjs.org/Library/TerrysTypingRoom.m4a";
-      // var reverbUrl = "http://reverbjs.org/Library/MidiverbMark2Preset29.m4a";
+        // var reverbUrl = "http://reverbjs.org/Library/R1NuclearReactorHall.m4a";
+        // var reverbUrl = "http://reverbjs.org/Library/TerrysTypingRoom.m4a";
+        // var reverbUrl = "http://reverbjs.org/Library/MidiverbMark2Preset29.m4a";
         //var reverbUrl = "http://reverbjs.org/Library/KinoullAisle.m4a";
-       //var reverbUrl = "http://reverbjs.org/Library/Basement.m4a";
-      let reverbUrl = "audio/ErrolBrickworksKiln.mp4";
-      
+        //var reverbUrl = "http://reverbjs.org/Library/Basement.m4a";
+        let reverbUrl = "audio/ErrolBrickworksKiln.mp4";
 
 
-        
-        let reverb = ctx.createReverbFromUrl(reverbUrl, function() {
+
+
+        let reverb = ctx.createReverbFromUrl(reverbUrl, function () {
             reverb.connect(compressor);
         });
-        this.reverb = reverb; 
-    
+        this.reverb = reverb;
+
         this.synth.connect(this.gain);
         this.gain.connect(this.reverb);
-        this.compressor.connect(ctx.destination);
+        this.compressor.connect(fft);
+        fft.connect(ctx.destination)
 
 
-        
     }
 
     pressed(_x = 0, _y = 0) {
-        let x = map(_x, 0, w, this.prange[0], this.prange[1])**3;
-        let y = map(_y, h, 0, this.frange[0], this.frange[1])**(2);
+        let x = map(_x, 0, w, this.prange[0], this.prange[1]) ** 3;
+        let y = map(_y, h, 0, this.frange[0], this.frange[1]) ** (2);
 
         let a = map(_x, 0, w, 1, 1000);
         let b = map(_y, h, 0, 1, 1000);
 
-        console.log(x,a,y);
-
         this.synth.setNote(x);
         this.synth.setFilter(y);
-        this.synth.waveshaper.curve =  makeDistortionCurve(400, a,b);
+        this.synth.waveshaper.curve = makeDistortionCurve(400, a, b);
 
 
 
@@ -226,20 +256,20 @@ class Group {
     }
 }
 
-function makeDistortionCurve(amount,a=100, b=10) {
+function makeDistortionCurve(amount, a = 100, b = 10) {
     var k = typeof amount === 'number' ? amount : 50,
-      n_samples = 44100,
-      curve = new Float32Array(n_samples),
-      deg = Math.PI / 180,
-      i = 0,
-      x;
-    
-      for (; i < n_samples; ++i ) {
-      x = i * 2 / n_samples - 1;
-      curve[i] = b*sin(a*x)+ a*sin(b*x);
+        n_samples = 44100,
+        curve = new Float32Array(n_samples),
+        deg = Math.PI / 180,
+        i = 0,
+        x;
+
+    for (; i < n_samples; ++i) {
+        x = i * 2 / n_samples - 1;
+        curve[i] = b * sin(a * x) + a * sin(b * x);
     }
     return curve;
-  };
+};
 
 
 /*************************
