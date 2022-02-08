@@ -12,14 +12,15 @@ let synths = [];
 let contextStarted;
 let w, h;
 const root = 100;
+let ctx; 
 
 
 /*************************
  * synth start boilerplate 
  *************************/
 
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-const ctx = new AudioContext();
+
+
 
 function touchStarted() {
     return false;
@@ -28,6 +29,9 @@ function touchStarted() {
 function touchEnded() {
     if (!contextStarted) {
         let a = select('#instructions');
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        ctx = new AudioContext();
+        setupSynths();
         a.remove();
         contextStarted = true;
     }
@@ -68,7 +72,6 @@ function setup() {
     h = windowHeight;
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
-    setupSynths();
     background(300, 100, 100);
     playButton();
     frameRate(30);
@@ -153,7 +156,7 @@ class Group {
         this.playing = false;
 
         this.gain = ctx.createGain();
-        this.gain.gain.value = 1;
+        this.gain.gain.value = 0.5;
 
         this.gain.connect(ctx.destination);
         this.synth = new Synth(this.root);
