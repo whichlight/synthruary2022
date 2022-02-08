@@ -31,6 +31,9 @@ function touchEnded() {
         let a = select('#instructions');
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         ctx = new AudioContext();
+        reverbjs.extend(ctx);
+
+
         setupSynths();
         a.remove();
         contextStarted = true;
@@ -108,6 +111,7 @@ class Synth {
         this.filter = ctx.createBiquadFilter();
         this.filter.type = "lowpass";
         this.filter.frequency.setValueAtTime(1000, ctx.currentTime)
+        this.filter.Q.value = 1;
 
         this.waveshaper = ctx.createWaveShaper(); 
         this.waveshaper.curve =  makeDistortionCurve(400);
@@ -115,7 +119,7 @@ class Synth {
 
         this.osc = ctx.createOscillator();
         this.osc.frequency.value = freq;
-        this.osc.type = "sine";
+        this.osc.type = "triangle";
 
         this.osc.connect(this.waveshaper);  
         this.waveshaper.connect(this.filter);
@@ -132,12 +136,11 @@ class Synth {
     }
 
     setNote(freq) {
-        this.waveshaper.curve =  makeDistortionCurve(400, freq*2);
-        this.osc.frequency.linearRampToValueAtTime(freq, ctx.currentTime + 0.1);
+        this.osc.frequency.linearRampToValueAtTime(freq, ctx.currentTime + 0.001);
     }
 
     setFilter(freq){
-        this.filter.frequency.linearRampToValueAtTime(freq, ctx.currentTime + 0.1);
+        this.filter.frequency.linearRampToValueAtTime(freq, ctx.currentTime + 0.001);
     }
 
     connect(out){
@@ -150,28 +153,63 @@ class Synth {
 class Group {
     constructor() {
         this.root = root;
-        this.prange = [50, 500];
-        this.frange = [100, 2000];
-
+        this.prange = [2, 15];
+        this.frange = [3, 50];
         this.playing = false;
 
-        this.gain = ctx.createGain();
-        this.gain.gain.value = 0.5;
 
-        this.gain.connect(ctx.destination);
+        this.gain = ctx.createGain();
+        this.gain.gain.value = 1;
         this.synth = new Synth(this.root);
-        this.synth.connect(this.gain);
+
+        // Create a compressor node
+        this.compressor = ctx.createDynamicsCompressor();
+        this.compressor.threshold.setValueAtTime(-50, ctx.currentTime);
+        this.compressor.knee.setValueAtTime(40, ctx.currentTime);
+        this.compressor.ratio.setValueAtTime(12, ctx.currentTime);
+        this.compressor.attack.setValueAtTime(0, ctx.currentTime);
+        this.compressor.release.setValueAtTime(0.01, ctx.currentTime);
         
+        let compressor = this.compressor; 
+
+
+        //trying our different reverbs
+       // var reverbUrl = "http://reverbjs.org/Library/R1NuclearReactorHall.m4a";
+       // var reverbUrl = "http://reverbjs.org/Library/TerrysTypingRoom.m4a";
+      // var reverbUrl = "http://reverbjs.org/Library/MidiverbMark2Preset29.m4a";
+        //var reverbUrl = "http://reverbjs.org/Library/KinoullAisle.m4a";
+       //var reverbUrl = "http://reverbjs.org/Library/Basement.m4a";
+      let reverbUrl = "audio/ErrolBrickworksKiln.mp4";
+      
+
+
+        
+        let reverb = ctx.createReverbFromUrl(reverbUrl, function() {
+            reverb.connect(compressor);
+        });
+        this.reverb = reverb; 
+    
+        this.synth.connect(this.gain);
+        this.gain.connect(this.reverb);
+        this.compressor.connect(ctx.destination);
+
+
         
     }
 
     pressed(_x = 0, _y = 0) {
-        let x = map(_x, 0, w, this.prange[0], this.prange[1]);
-        let y = map(_y, h, 0, this.frange[0], this.frange[1]);
+        let x = map(_x, 0, w, this.prange[0], this.prange[1])**3;
+        let y = map(_y, h, 0, this.frange[0], this.frange[1])**(2);
 
+        let a = map(_x, 0, w, 1, 1000);
+        let b = map(_y, h, 0, 1, 1000);
 
-        this.synth.setNote(this.root + x);
-        this.synth.setFilter(this.root + y);
+        console.log(x,a,y);
+
+        this.synth.setNote(x);
+        this.synth.setFilter(y);
+        this.synth.waveshaper.curve =  makeDistortionCurve(400, a,b);
+
 
 
         this.play();
@@ -188,7 +226,7 @@ class Group {
     }
 }
 
-function makeDistortionCurve(amount,amp=100) {
+function makeDistortionCurve(amount,a=100, b=10) {
     var k = typeof amount === 'number' ? amount : 50,
       n_samples = 44100,
       curve = new Float32Array(n_samples),
@@ -198,7 +236,7 @@ function makeDistortionCurve(amount,amp=100) {
     
       for (; i < n_samples; ++i ) {
       x = i * 2 / n_samples - 1;
-      curve[i] = amp*sin(x*amp);
+      curve[i] = b*sin(a*x)+ a*sin(b*x);
     }
     return curve;
   };
