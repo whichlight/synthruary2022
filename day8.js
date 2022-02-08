@@ -106,11 +106,16 @@ class Synth {
         this.filter.type = "lowpass";
         this.filter.frequency.setValueAtTime(1000, ctx.currentTime)
 
+        this.waveshaper = ctx.createWaveShaper(); 
+        this.waveshaper.curve =  makeDistortionCurve(400);
+        this.waveshaper.oversample = '4x';
+
         this.osc = ctx.createOscillator();
         this.osc.frequency.value = freq;
-        this.osc.type = "triangle";
+        this.osc.type = "sine";
 
-        this.osc.connect(this.filter);  
+        this.osc.connect(this.waveshaper);  
+        this.waveshaper.connect(this.filter);
         this.filter.connect(this.gain);  
         this.osc.start();
     }
@@ -124,7 +129,12 @@ class Synth {
     }
 
     setNote(freq) {
+        this.waveshaper.curve =  makeDistortionCurve(400, freq*2);
         this.osc.frequency.linearRampToValueAtTime(freq, ctx.currentTime + 0.1);
+    }
+
+    setFilter(freq){
+        this.filter.frequency.linearRampToValueAtTime(freq, ctx.currentTime + 0.1);
     }
 
     connect(out){
@@ -137,31 +147,34 @@ class Synth {
 class Group {
     constructor() {
         this.root = root;
-        this.frange = [50, 500];
-        this.playing = false;
+        this.prange = [50, 500];
+        this.frange = [100, 2000];
 
-        this.waveshaper = ctx.createWaveShaper(); 
-        this.waveshaper.curve =  makeDistortionCurve(400);
-        this.waveshaper.oversample = '4x';
+        this.playing = false;
 
         this.gain = ctx.createGain();
         this.gain.gain.value = 1;
 
         this.gain.connect(ctx.destination);
         this.synth = new Synth(this.root);
-        this.synth.connect(this.waveshaper);
-        this.waveshaper.connect(this.gain)
+        this.synth.connect(this.gain);
         
         
     }
 
     pressed(_x = 0, _y = 0) {
-        let x = map(_x, 0, w, this.frange[0], this.frange[1]);
-        this.play(this.root + x);
+        let x = map(_x, 0, w, this.prange[0], this.prange[1]);
+        let y = map(_y, h, 0, this.frange[0], this.frange[1]);
+
+
+        this.synth.setNote(this.root + x);
+        this.synth.setFilter(this.root + y);
+
+
+        this.play();
     }
 
-    play(f) {
-        this.synth.setNote(f);
+    play() {
         this.synth.play();
         this.playing = true;
     }
@@ -172,16 +185,17 @@ class Group {
     }
 }
 
-function makeDistortionCurve(amount) {
+function makeDistortionCurve(amount,amp=100) {
     var k = typeof amount === 'number' ? amount : 50,
       n_samples = 44100,
       curve = new Float32Array(n_samples),
       deg = Math.PI / 180,
       i = 0,
       x;
-    for ( ; i < n_samples; ++i ) {
+    
+      for (; i < n_samples; ++i ) {
       x = i * 2 / n_samples - 1;
-      curve[i] = ( 3 + k ) * x * 20 * deg / ( Math.PI + k * Math.abs(x) );
+      curve[i] = amp*sin(x*amp);
     }
     return curve;
   };
