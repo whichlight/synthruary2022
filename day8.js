@@ -95,7 +95,7 @@ function setup() {
 
 function draw() {
     if (contextStarted) {
-        background(60, 0, 40);
+        background(60, 100, 100);
 
         fft.getByteFrequencyData(dataArray);
 
