@@ -95,7 +95,7 @@ function setup() {
 
 function draw() {
     if (contextStarted) {
-        background(60, 100, 100);
+        background(60, 0, 40);
 
         fft.getByteFrequencyData(dataArray);
 
@@ -105,13 +105,15 @@ function draw() {
             let v = dataArray[i] / 128.0;
             let x = v *100;
             y = i*ystep;
+            v=v**(1/2.);
+            v=v*1.3;
 
-
-            let c= (200+180*v)%360; 
+            let c= (180*v)%360; 
             fill(c, 100, 100);
            // fill((200+90*v)%360, 100, 100);
-            let r = v*(w/2); 
-            ellipse(w/2,h-y-(h/8), r, r/2);
+            let r = v*(min(w,h)/2); 
+            let h2 = h-r/4; 
+            ellipse(w/2,(h2/h)*h-y, r, r/2);
         }
 
 
