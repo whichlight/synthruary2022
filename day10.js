@@ -10,6 +10,9 @@
 let contextStarted;
 let w, h;
 const root = 70;
+let bgcolor = [120,50,100];
+let textcolor = [260, 50, 100];
+let breathcolor = [60, 50, 100]; 
 
 
 /*************************
@@ -27,7 +30,7 @@ function touchEnded() {
         Tone.start();
         let a = select('#instructions');
         a.remove();
-        background(30, 100, 100, 100);
+        background(bgcolor[0], bgcolor[1], bgcolor[2]);
         contextStarted = true;
     }
 
@@ -40,7 +43,7 @@ function touchEnded() {
 function playButton() {
     push();
     translate(width * 0.5, height * 0.5);
-    fill(60, 100, 100);
+    fill(breathcolor[0],breathcolor[1],breathcolor[2]);
     noStroke();
     polygon(0, 0, 50, 3);
     pop();
@@ -68,7 +71,7 @@ function setup() {
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
     setupSynths();
-    background(30, 100, 100, 100);
+    background(bgcolor[0], bgcolor[1], bgcolor[2]);
     playButton();
     frameRate(20);
     noStroke();
@@ -77,7 +80,7 @@ function setup() {
 
 function draw() {
     if (contextStarted) {
-        background(30, 100, 100, 100);
+        background(bgcolor[0], bgcolor[1], bgcolor[2]);
         group.displayBreath(); 
         group.displayText(); 
         group.loop(); 
@@ -173,18 +176,18 @@ class Group {
         switch(this.state){
             case 0: 
                 s = "gently breathing in";
-                this.counter++; 
                 this.elapsed = millis()-this.start; 
-                this.counter = this.elapsed; 
+                this.counter = this.elapsed*2; 
                 break;
             case 1: 
                 s = "exhale and let go";
                 if(this.elapsed>0 && this.counter > 0) {
-                    this.counter = this.elapsed + (this.start- millis());
+                    this.counter = this.elapsed*2 + (this.start- millis());
                 }; 
                 break;
         }
-        fill(60,100,100);
+        textFont('Georgia');
+        fill(textcolor[0],textcolor[1],textcolor[2]);
         text(s, w/2, h/2);
 
 
@@ -192,7 +195,7 @@ class Group {
 
     displayBreath(){
         let r = map(this.counter/1000,0, 8, 0, min(w,h));
-        fill(240,100,100);
+        fill(breathcolor[0],breathcolor[1],breathcolor[2]);
         ellipse(w/2,h/2,r,r);
     }
 
