@@ -27,7 +27,7 @@ function touchEnded() {
         Tone.start();
         let a = select('#instructions');
         a.remove();
-        background(280, 100, 100, 100);
+        background(30, 100, 100, 100);
         contextStarted = true;
     }
 
@@ -40,7 +40,7 @@ function touchEnded() {
 function playButton() {
     push();
     translate(width * 0.5, height * 0.5);
-    fill(200, 100, 100);
+    fill(60, 100, 100);
     noStroke();
     polygon(0, 0, 50, 3);
     pop();
@@ -68,7 +68,7 @@ function setup() {
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
     setupSynths();
-    background(280, 100, 100, 100);
+    background(30, 100, 100, 100);
     playButton();
     frameRate(20);
     noStroke();
@@ -77,7 +77,7 @@ function setup() {
 
 function draw() {
     if (contextStarted) {
-        background(280, 100, 100, 100);
+        background(30, 100, 100, 100);
         group.displayBreath(); 
         group.displayText(); 
         group.loop(); 
@@ -102,7 +102,7 @@ function synthReleased() {
 function setupSynths() {
     let root = 55;
     let intervals = [0, 5, 7, 16, 19];
-    let vols = [-2, -5, -10, -5, -10];
+    let vols = [-2, -5, -10, -10, -10];
     let synths = [];
     notes = intervals.map((i) => root + i);
 
@@ -121,7 +121,7 @@ class Note {
     constructor(note, vol) {
         // this.comp = new Tone.Compressor(-5, 3).toDestination();
         this.lowfilter = new Tone.Filter(1000, "lowpass");
-        this.highfilter = new Tone.Filter(300, "highpass").connect(this.lowfilter);
+        this.highfilter = new Tone.Filter(200, "highpass").connect(this.lowfilter);
         this.osc = new Tone.Synth().connect(this.highfilter);
         this.lowfilter.Q.value = 1; 
         this.highfilter.Q.value = 1; 
@@ -131,7 +131,7 @@ class Note {
         this.osc.envelope.decay = 1;
         this.osc.envelope.sustain = 1;
 
-        this.osc.envelope.release = 5;
+        this.osc.envelope.release = 10;
         this.osc.volume.value = -2*abs(vol);
         this.note = note;
         this.pitch = Tone.Frequency(this.note, "midi");
@@ -156,7 +156,7 @@ class Group {
       //  this.states = ["prompt-in", "counter-in", "prompt-out", "counter-out"];
         this.active = false;
         this.counter = 0; 
-        this.compressor = new Tone.Compressor(-50, 5);
+        this.compressor = new Tone.Compressor(-40, 20);
         this.compressor.release.value = 0.01;
         this.compressor.toDestination(); 
         this.synths.forEach((s)=>{
@@ -172,33 +172,34 @@ class Group {
         let s = "press and breathe in. \n let go and breathe out.";
         switch(this.state){
             case 0: 
-                s = "breathing in";
+                s = "gently breathing in";
                 this.counter++; 
+                this.elapsed = millis()-this.start; 
+                this.counter = this.elapsed; 
                 break;
             case 1: 
                 s = "exhale and let go";
-                if(this.counter>0) {
-                    this.counter--
-                    
+                if(this.elapsed>0 && this.counter > 0) {
+                    this.counter = this.elapsed + (this.start- millis());
                 }; 
                 break;
         }
-        fill(180,100,100);
+        fill(60,100,100);
         text(s, w/2, h/2);
 
 
     }
 
     displayBreath(){
-        let r = map(this.counter,0, 160, 0, min(w,h))/2;
-        fill(300,100,100);
+        let r = map(this.counter/1000,0, 8, 0, min(w,h));
+        fill(240,100,100);
         ellipse(w/2,h/2,r,r);
     }
 
     pressed() {
         this.active = true;
         if (this.active) {
-
+            this.start = millis(); 
             this.state = 0; 
             this.synths.forEach((s) => {
                 s.release();
@@ -208,14 +209,16 @@ class Group {
 
     released() {
         if (this.active) {
+            this.start = millis(); 
             this.state = 1;
 
-            this.activeNoteIndex = map(this.counter, 0, 100, 0, this.synths.length);
-            console.log(this.activeNoteIndex);
+            this.activeNoteIndex = map(this.counter/1000, 0, 8, 0, this.synths.length);
+            let f = map(this.counter/1000, 0, 8, 0, 1000);
 
             this.synths.forEach((s,i) => {
                 if(i<this.activeNoteIndex){
                     s.play();
+                    s.lowfilter.frequency.value = f;
                 }
             });
         }
@@ -224,7 +227,7 @@ class Group {
 
     loop(){
         if(this.active){
-            if(this.counter < 1){
+            if(this.counter < 0.01){
                 this.synths.forEach((s) => {
                     s.release();
                 });
