@@ -33,7 +33,7 @@ function touchEnded() {
 function playButton() {
     push();
     translate(width * 0.5, height * 0.5);
-    fill(180, 100, 100);
+    fill(0, 20, 100);
     noStroke();
     polygon(0, 0, 50, 3);
     pop();
@@ -97,17 +97,21 @@ let intervals = Array.from({length: num}, (_, i) => i + 1)
 function setupSynths() {
     let synths = [];
 
-    let side = min(200, min(w, h) / 10);
+ 
 
     let index = 0; 
     let xmax = 6; 
     let ymax = 6;
     let s = min(w,h);
-    for(let i = 0 ; i<xmax; i++){
-        for(let j =0; j<ymax; j++){
+    let side = s/(xmax+1);
+    let xbegin = (w-s)/2
+    let ybegin = (h-s)/2
+
+    for(let j = 0 ; j<ymax; j++){
+        for(let i =0; i<xmax; i++){
             
-        let x = map(i, 0, xmax, 2*side, s - side);
-        let y = map(j, 0, ymax, 2*side, s - side);
+        let x = xbegin+side+i*side; 
+        let y = ybegin+side+j*side;
         let pos = createVector(x, y);
         synths.push(new Note(index, pos, side));
         index++; 
@@ -173,6 +177,8 @@ class Note {
         this.sat = 0;
     }
 
+    //todo: display which beat in the measure by the radius 
+    // grow outward towards the full measure.
     display(tick, full) {
         noStroke();
         let b = 0;
@@ -228,6 +234,7 @@ class Group {
         }
     }
 
+    // todo : play these rhytms outside of the draw loop
     update() {
         this.synths.forEach((s, i) => {
             let n = floor(this.ticklen / (i + 1));
