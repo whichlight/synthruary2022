@@ -7,7 +7,8 @@
  * 
  */
 
-let contextStarted= true;
+
+let contextStarted = false;
 let w, h;
 const root = 70;
 
@@ -19,14 +20,13 @@ function touchStarted() {
 }
 
 function touchEnded() {
+    noteClicked();
     if (!contextStarted) {
         Tone.start();
         let a = select('#instructions');
         a.remove();
-        background(280, 100, 50, 100);
         contextStarted = true;
     }
-    noteClicked(); 
     return false;
 }
 
@@ -61,133 +61,202 @@ function setup() {
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
     setupSynths();
-    background(280, 100, 50, 100);
+    background(0, 100, 100, 100);
     playButton();
     noStroke();
 }
 
 function draw() {
     if (contextStarted) {
+        background(0, 100, 100, 100);
 
-        for(s of group.synths){
-            s.display(); 
+        group.displayTick();
+
+        for (s of group.synths) {
+            s.display(group.tick, group.ticklen);
         }
-        group.update(); 
+        group.update();
     }
 }
 
-function noteClicked(){
-    group.clicked(mouseX, mouseY);
-    
+function noteClicked() {
+    if(contextStarted){
+        group.clicked(mouseX, mouseY);
+    }
 }
+
+
 
 /*************************
  * synthy things 
  *************************/
 
+ let num = 36;
+let intervals = Array.from({length: num}, (_, i) => i + 1)
 
 function setupSynths() {
-    let intervals = [1,2,3,4,5,6,7,8,9];
-    let side = 20; 
-    let synths = []; 
+    let synths = [];
 
-    intervals.forEach((n,i)=>{
-        let x = map(i,0, intervals.length, 2*side, w-2*side);
-        let pos = createVector(x, h/2);
-        synths.push(new Note(n, pos));
-    })
-    group = new Group(synths); 
+    let side = min(200, min(w, h) / 10);
+
+    let index = 0; 
+    let xmax = 6; 
+    let ymax = 6;
+    let s = min(w,h);
+    for(let i = 0 ; i<xmax; i++){
+        for(let j =0; j<ymax; j++){
+            
+        let x = map(i, 0, xmax, 2*side, s - side);
+        let y = map(j, 0, ymax, 2*side, s - side);
+        let pos = createVector(x, y);
+        synths.push(new Note(index, pos, side));
+        index++; 
+
+
+        }
+    }
+
+    group = new Group(synths);
 }
 
 //volume, filtering, and len for successive notes 
 // add timing update
 
+
 class Note {
-    constructor(note, pos) {
-        this.note = note; 
-        this.f = Tone.Frequency(50+100*note); 
-        this.filter = new Tone.Filter(this.f, "bandpass").toDestination(); 
-        this.osc = new Tone.NoiseSynth().connect(this.filter);
-        this.filter.Q.value=10;
+    constructor(val, pos, side) {
+        this.val = val;
+
+        this.osc = new Tone.NoiseSynth()
         this.osc.envelope.attack = 0.001;
-        this.osc.envelope.decay = 0.1;
+        let v = map(val, 1, intervals[intervals.length - 1], 0, -10);
+        this.osc.volume.value = -1 * abs(v);
+
+        let d = map(val, 1, intervals[intervals.length - 1], 1, 0.1);
+        d = d ** 2;
+        this.osc.envelope.decay = d;
         this.osc.envelope.sustain = 0;
         this.osc.envelope.release = 0.4;
+
+        this.filter = new Tone.Filter(200, "bandpass");
+        let f = map(val, 1, intervals[intervals.length - 1], 200, 1000);
+        this.filter.frequency.value = f;
+        this.filter.Q.value = 20;
+
         this.pos = pos;
-        this.r = min(100, min(w,h)/8);
-        this.sat = 100; 
-        this.active = false; 
+        this.r = side;
+        this.sat = 100;
+        this.active = false;
+
+        // Create a compressor node
+
+
+        this.compressor = new Tone.Compressor(-50, 12);
+        this.compressor.release.value = 0.01;
+
+        this.osc.connect(this.filter);
+        this.filter.connect(this.compressor);
+        this.compressor.toDestination();
     }
 
-    isClicked(m){
-        return (p5.Vector.dist(m, this.pos) < this.r)
+    isClicked(m) {
+        return (p5.Vector.dist(m, this.pos) < (this.r/2))
     }
 
 
     pluck(len = 0.5) {
-        this.osc.volume.value = -1*(this.note); 
+
         this.osc.triggerAttack();
     }
 
-    glow(){
-        this.sat = 0; 
+    glow() {
+        this.sat = 0;
     }
 
-    display() {
+    display(tick, full) {
         noStroke();
-        let b = 0; 
-        if(this.active){b = 100};
-        fill(300, this.sat, b)
-        ellipse(this.pos.x, this.pos.y, this.r, this.r);
-        if(this.sat<100) this.sat+=10; 
+        let b = 0;
+        let n = floor(full / (this.val+1));
+        let p = tick % n;
+        let v = p/n; 
+        let angle = v*PI*2; 
+        if (this.active) { 
+            b = 100 
+            fill(240, this.sat, b)
+            arc(this.pos.x, this.pos.y, this.r, this.r, -1*PI/2, angle-PI/2);
+        }
+        if(!this.active){
+            fill(240, 0, 0)
+            ellipse(this.pos.x, this.pos.y, this.r, this.r);
+        }
+   
+        if (this.sat < 100) this.sat += 5;
     }
 }
 
-class Group{
-    constructor(synths){
-        this.synths = synths; 
-        this.ticklen = 100;
+//make a fader knob for tempo 
+
+class Group {
+    constructor(synths) {
+        this.synths = synths;
+        this.tickMax = 256; 
+        this.ticklen = this.tickMax;
+
         this.tick = 0;
     }
 
-    clicked(x, y){
-        let index = this.synths.findIndex((s, i) => s.isClicked(createVector(x,y)));
-        this.switch(index);
+    clicked(x, y) {
+        let index = this.synths.findIndex((s, i) => s.isClicked(createVector(x, y)));
+        if(typeof this.synths[index] !== "undefined"){
+            this.switch(index);
+        } else{
+            this.ticklen = floor(map(mouseX, 0, w, 0, this.tickMax));
+            this.tick=0;
+        }
     }
 
-    switch(index){
+    switch(index) {
         let s = this.synths[index];
-        this.synths[index].active = !s.active; 
+        this.synths[index].active = !s.active;
     }
 
-    play(index){
-        let s = this.synths[index]; 
-        if(s) {
-            s.pluck(); 
-            s.glow();             
-        }   
+    play(index) {
+        let s = this.synths[index];
+        if (s) {
+            s.pluck();
+            s.glow();
+        }
     }
 
-    update(){
-        this.synths.forEach((s,i)=>{
-            let n = floor(this.ticklen/(i+1));
-            if(this.tick % n == 0 && s.active){
+    update() {
+        this.synths.forEach((s, i) => {
+            let n = floor(this.ticklen / (i + 1));
+            if (this.tick % n == 0 && s.active) {
                 this.play(i);
             }
         });
 
-        this.tick++; 
-        if(this.tick>=this.ticklen){
-            console.log('looping');
-        }
-        this.tick%=this.ticklen; 
+        this.tick++;
+        this.tick %= this.ticklen;
+    }
+
+    displayTick(){
+        let s = (this.ticklen/this.tickMax)*w; 
+        fill(60,100,100);
+        rect(0,0,s,h);
+
+        let a = (this.tick/this.tickMax)*w; 
+        fill(300,100,100);
+        rect(0,0,a,h);
+
+
     }
 
 }
 
 
-function sum(arr){
-    return arr.reduce((a,b)=>a+b);
+function sum(arr) {
+    return arr.reduce((a, b) => a + b);
 }
 
 
