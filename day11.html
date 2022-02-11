@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./lib/p5.js"></script>
+    <script src="./lib/reverb.js"></script>
+    <script src="./day11.js"></script>
+    <title>day 11</title>
+    <style>
+     
+      body, canvas {
+        margin:0px;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        outline: none;
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
+        touch-action: none; 
+    }   
+    canvas{
+        position: absolute;
+        z-index:-1;
+    }
+
+    #instructions{
+        position: absolute; 
+        font-family:monospace;
+        margin:20px;
+        font-size:20px;
+        color:cyan;
+        
+    }
+      </style>
+  </head>
+  <body>
+    <main>
+        <div id="instructions">
+            <p><strong>Prompt: Spatial audio.</strong> This synth requires headphones. 
+              Slowly move the controls, and notice where it feels like the sound is coming from. 
+              This synth explores a drone with a panner using a 
+              Head Related Transfer Function, a method that seeks to more accurately represent spatial sound. 
+              I am interested in the way a sound may feel like it is coming from different parts of the body, 
+              the same way one might notice sensations from parts of the body during a mindful body scan. 
+              A filter is added such that areas above are prominent in higher frequences, and areas below in lower. 
+             
+
+            </p>
+            <p> Tap the screen to start.</p>
+            
+        </div>
+    </main>
+  </body>
+</html>
