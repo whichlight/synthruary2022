@@ -209,11 +209,10 @@ class Group {
 
         this.gain = ctx.createGain();
         this.gain.gain.value = 1;
-        this.synths.push(new Synth(this.root, 0.5));
-        this.synths.push(new Synth(this.root*1.5, 0.5));
-        this.synths.push(new Synth(this.root*2, 0.5));
-        this.synths.push(new Synth(this.root*3, 0.5));
-
+        this.synths.push(new Synth(this.root, 1));
+        this.synths.push(new Synth(this.root*1.5, 1));
+        this.synths.push(new Synth(this.root*2, 1));
+        this.synths.push(new Synth(this.root*3, 1));
 
         // listener
         this.listener = ctx.listener; 
@@ -224,7 +223,7 @@ class Group {
 
         // Create a compressor node
         this.compressor = ctx.createDynamicsCompressor();
-        this.compressor.threshold.setValueAtTime(-20, ctx.currentTime);
+        this.compressor.threshold.setValueAtTime(-50, ctx.currentTime);
         this.compressor.knee.setValueAtTime(40, ctx.currentTime);
         this.compressor.ratio.setValueAtTime(20, ctx.currentTime);
         this.compressor.attack.setValueAtTime(0, ctx.currentTime);
