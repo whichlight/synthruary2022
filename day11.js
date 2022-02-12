@@ -216,10 +216,14 @@ class Group {
 
         // listener
         this.listener = ctx.listener; 
+        this.listener.setPosition(posX, posY, posZ);
+        
+        /*
         this.listener.positionX.value = posX;
         this.listener.positionY.value = posY;
         this.listener.positionZ.value = posZ;
 
+        */
 
         // Create a compressor node
         this.compressor = ctx.createDynamicsCompressor();
