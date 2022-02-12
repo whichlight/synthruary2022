@@ -100,15 +100,15 @@ function draw() {
         background(bgval,100,100);
 
         
-        let r = w/2;
+        let r = min(w,h)/4;
         noStroke();
         fill(180,100,100);
         ellipse(w/2,h/2,r,r);
 
         push();
         translate(w/2,h/2);
-        translate(0,1.5*r);
-        rect(0,0,r,2*r,20);
+        translate(0,2*r);
+        rect(0,0,1.5*r,3*r,30);
         pop();
 
         /*
@@ -152,8 +152,8 @@ class Synth {
         this.vol = vol; 
 
         this.panner = new PannerNode(ctx, {
-            panningModel: "HRTF",
-            distanceModel: "exponential",
+            panningModel: 'HRTF',
+            distanceModel: 'exponential',
             positionX: posX,
             positionY: posY, 
             positionZ: posZ, 
@@ -273,7 +273,7 @@ class Group {
         //this.synth.setNote(x);
         this.play();
 
-        let r = w/4;
+        let r = min(w,h)/8;
 
   /*
         push()
