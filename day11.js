@@ -49,7 +49,7 @@ function touchEnded() {
 function playButton() {
     push();
     translate(width * 0.5, height * 0.5);
-    fill(0, 0, 0, 0.8);
+    fill(240, 100, 50);
     noStroke();
     polygon(0, 0, 50, 3);
     pop();
