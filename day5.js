@@ -109,7 +109,6 @@ function setupSynths() {
     let num = 3;     
 
     let hpoints = hexPoints(w/2,h/2,0.4*min(w,h));
-    console.log(hpoints);
 
     notes.forEach((n,i)=>{
         let pos = createVector(hpoints[i][0], hpoints[i][1]);
