@@ -72,8 +72,9 @@ function setup() {
     background(300, 100, 100, 100);
     playButton();
     frameRate(20);
-    noStroke();
     rectMode(CENTER);
+    strokeWeight(5);
+
 }
 
 function draw() {
@@ -83,21 +84,18 @@ function draw() {
 
             let spectrum = fft.analyze();
 
-            strokeWeight(5);
-            noFill();
+            fill(300,100,100);
             stroke(0,0,0);
             let len = 50; 
             for (i = 0; i < len; i++) {
                 let x = map(spectrum[i], 0, 255, 0, w);
                 let y = map(i,0, len, h, 0);
                 push()
-                translate(w/2,0);
-                rect(0,y,x,10);
+                translate(w/2,y);
+                rect(0,0,x,10);
                 pop();
-              
             }
-        
-
+    
             pitch.getPitch(function(err, frequency) {
                 if (frequency) {
                     group.play(frequency);
@@ -242,7 +240,12 @@ class Group {
         let r = min(w,h)/10;
         let a = map(f, 0, 500, h, 0);
         fill(180,100,100,100);
-        rect(w/2, a, r,r);
+
+        push();
+        translate(w/2,a);
+        rotate(PI/4);
+        rect(0, 0, r,r);
+        pop();
     }
 
 }
