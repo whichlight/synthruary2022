@@ -77,9 +77,9 @@ function setup() {
 
 }
 
-function drawMic(){
+function drawMic(c){
     let spectrum = fft.analyze();
-    fill(300,100,100);
+    fill(c,100,100);
     stroke(180,100,100);
     let len = 50; 
     for (i = 0; i < len; i++) {
@@ -94,15 +94,17 @@ function drawMic(){
 
 function draw() {
     if (contextStarted && modelIsLoaded) {
+        background(300,100,100);
         if(synthActive){
-            background(60,100,100);
+          drawMic(60); 
+
         }
         else{
-            background(300,100,100);
+             drawMic(300); 
+
             group.release();  
         }
 
-        drawMic(); 
 
 
         if(synthActive){
