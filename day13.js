@@ -77,39 +77,44 @@ function setup() {
 
 }
 
+function drawMic(){
+    let spectrum = fft.analyze();
+    fill(300,100,100);
+    stroke(180,100,100);
+    let len = 50; 
+    for (i = 0; i < len; i++) {
+        let x = map(spectrum[i], 0, 255, h/len, w);
+        let y = map(i,0, len, h, 0)-7.5;
+        push()
+        translate(w/2,y);
+        rect(0,0,x,h/len);
+        pop();
+    }
+}
+
 function draw() {
     if (contextStarted && modelIsLoaded) {
         if(synthActive){
             background(60,100,100);
-
-            let spectrum = fft.analyze();
-
-            fill(300,100,100);
-            stroke(0,0,0);
-            let len = 50; 
-            for (i = 0; i < len; i++) {
-                let x = map(spectrum[i], 0, 255, 0, w);
-                let y = map(i,0, len, h, 0);
-                push()
-                translate(w/2,y);
-                rect(0,0,x,10);
-                pop();
-            }
-    
-            pitch.getPitch(function(err, frequency) {
-                if (frequency) {
-                    group.play(frequency);
-                    group.draw(frequency);
-                } else{
-                    group.release();  
-                }
-              });
         }
         else{
             background(300,100,100);
             group.release();  
+        }
+
+        drawMic(); 
 
 
+        if(synthActive){
+            pitch.getPitch(function(err, frequency) {
+                if (frequency) {
+                    group.play(frequency);
+                    group.draw(frequency);
+                    console.log(frequency);
+                } else{
+                    group.release();  
+                }
+              });
         }
     }
 }
@@ -239,8 +244,8 @@ class Group {
     draw(f){
         let r = min(w,h)/10;
         let a = map(f, 0, 500, h, 0);
-        fill(180,100,100,100);
-
+        stroke(180,100,100,100);
+        fill(0,100,100,100);
         push();
         translate(w/2,a);
         rotate(PI/4);
