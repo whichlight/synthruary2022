@@ -112,7 +112,6 @@ function draw() {
                 if (frequency) {
                     group.play(frequency);
                     group.draw(frequency);
-                    console.log(frequency);
                 } else{
                     group.release();  
                 }
