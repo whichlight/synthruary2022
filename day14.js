@@ -13,7 +13,7 @@ const root = 70;
 let group; 
 const pMin = 30; 
 const pMax = 60; 
-const breatheTime = 6;
+const breatheTime = 4;
 
 
 /*************************
@@ -71,12 +71,9 @@ function setup() {
     h = windowHeight;
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
-    background(280, 100, 100, 100);
+    background(0, 100, 50);
     playButton();
     frameRate(20);
-  //  rectMode(CENTER);
-   // strokeWeight(5);
-
 }
 
 
@@ -87,9 +84,6 @@ function draw() {
        
       
         group.drawPitches(); 
-
-
-        // play ambient note 
 
       
         if(group.you.isReady() && !group.matched){
@@ -200,7 +194,7 @@ class Group {
         this.youPlay(); 
 
         this.reverb = new Tone.Reverb().toDestination();
-        this.reverb.decay = 10; 
+        this.reverb.decay = 20; 
         this.me.lowfilter.connect(this.reverb);
         this.you.lowfilter.connect(this.reverb);
     }
@@ -239,7 +233,9 @@ class Group {
         for(let i=0; i<num; i++){
             stroke(0,0,50);
             let c = map(i%12,0,12,100,0);
-            fill(280,100,c);
+            let v = this.you.getLevel(); 
+            let b = map(v, 0,1,0,100); 
+            fill(0,b,c);
             rect(0,i*side,w,side);
         }
         
@@ -247,7 +243,7 @@ class Group {
             let i = this.me.pitch.toMidi() - pMin+1;
             let v = this.me.getLevel(); 
             let b = map(v, 0,1,0,100); 
-            let c = 30; 
+            let c = 240; 
             if(this.matched) c = 120; 
             fill(c,b,100);
             rect(0,h-i*side,w,side);
