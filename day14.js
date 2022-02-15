@@ -44,7 +44,7 @@ function touchEnded() {
 function playButton() {
     push();
     translate(width * 0.5, height * 0.5);
-    fill(180, 100, 100);
+    fill(0, 100, 100);
     noStroke();
     polygon(0, 0, 50, 3);
     pop();
