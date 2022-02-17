@@ -264,6 +264,7 @@ class Particle {
         let c = floor(map(val, dmin,dmax,180,360));
         this.c = c;
         this.collision = createVector(0,0);
+        this.s = 100; 
     }
 
     play(){
@@ -277,13 +278,14 @@ class Particle {
         this.vel.add(this.acc);
         this.acc = createVector(0, 0);
         this.collision = createVector(0,0);
-        this.vel.limit(10);
+        this.vel.limit(5);
         this.pos.add(this.vel); 
+        if(this.s < 100) this.s+=5; 
         
     }
 
     render() {
-        fill(this.c, 100, 100);
+        fill(this.c, this.s, 100);
         noStroke();
         circle(this.pos.x, this.pos.y, this.d);
     }
@@ -295,24 +297,30 @@ function checkOverlap(p) {
         if (p != q) {
             let cd = p5.Vector.dist(p.pos, q.pos);
             let rd = (p.d + q.d) / 2;
-            if (cd < rd) {
-                //collision 
 
-                p.play();
+
                 
                 let force = p5.Vector.sub(q.pos, p.pos);
                 let d = force.mag();
-                d = constrain(d, 1, 100);
-                let G = 100;
+               // d = constrain(d, 1, 100);
+                let G = 50;
                 let strength = G / (d * d);
                 force.setMag(strength);
-                force.mult(-10);
-                let col = p5.Vector.sub(q.vel, p.vel);
-                p.collision.add(force);
+              
+
+                if (cd < rd) {
+                    //collision 
+                    force.mult(-10);
                 p.vel.x = -1*p.vel.x; 
                 p.vel.y = -1*p.vel.y; 
                 
-            }
+                    p.play();
+                    p.s =0; 
+
+                 }
+                 p.collision.add(force);
+
+
         }
     })
 
