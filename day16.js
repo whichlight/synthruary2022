@@ -7,6 +7,7 @@
  * 
  */
 
+
 let contextStarted;
 let w, h;
 const root = 70;
@@ -15,6 +16,8 @@ let notes;
 
 const numParticles = 150;
 let particles = [];
+let dmax = 100; 
+let dmin = 10; 
 
 
 /*************************
@@ -73,7 +76,7 @@ function setup() {
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
     setupSynths();
-    background(0, 0, 0);
+    background(60, 100, 100);
     playButton();
     frameRate(20);
     noStroke();
@@ -83,7 +86,7 @@ function draw() {
     if (contextStarted) {
      
 
-        background(0, 0, 0);
+        background(60, 100, 100);
 
         particles.forEach(function (p) {
             p.update();
@@ -95,17 +98,31 @@ function draw() {
             
         });
 
+        if(mouseIsPressed){
+            if(gd<dmax) gd+=5; 
+        
+            fill(0,0,0);
+            circle(gpos.x, gpos.y, gd);
+            stroke(0,0,0);
+            line(gpos.x, gpos.y, mouseX, mouseY);
+        }
+
     }
 }
 
+let gpos; 
+let gd; 
 function synthOn() {
-    group.clicked(mouseX, mouseY);
+    gpos = createVector(mouseX, mouseY); 
+    gd=5; 
 }
 
 function synthRelease() {
-    createSingleParticle(createVector(mouseX,mouseY)); 
-
-  //  group.release();
+    let m = createVector(mouseX, mouseY); 
+    let diff = p5.Vector.sub(m, gpos);
+    let vel = diff.copy();
+    vel.mult(0.05);
+    createSingleParticle(gpos, gd, vel); 
 }
 
 /*************************
@@ -117,7 +134,7 @@ function setupSynths() {
 
     notes = [];
     let intervals = [0, 2, 4, 6, 7, 9, 11];
-    for (j = 4; j < 8; j++) {
+    for (j = 3; j < 8; j++) {
         val = intervals.map((i) => (i + 12 * j));
         notes = notes.concat(val);
     }
@@ -227,11 +244,11 @@ function createParticles() {
     }
 }
 
-function createSingleParticle(_pos=createVector(w/2,h/2), _vel=createVector(random(-5,5),random(-5,5))){
+function createSingleParticle(_pos, _d, _vel){
     let pos = _pos;
     let vel = _vel;
     let acc = createVector(0,0);
-    let size = random(10, 50);
+    let size = _d;
     let c = random(80, 130);
     particles.push(new Particle(pos, vel, acc, size, c));
 }
@@ -242,13 +259,16 @@ class Particle {
         this.vel = _vel;
         this.d = _size;
         this.acc = _acc;
-        this.c = _c;
+
+        let val = constrain(this.d, dmin, dmax);
+        let c = floor(map(val, dmin,dmax,180,360));
+        this.c = c;
         this.collision = createVector(0,0);
     }
 
     play(){
-        let f = floor(map(this.d, 10,50,notes.length-1,0));
-        console.log(notes[f]);
+        let val = constrain(this.d, dmin, dmax);
+        let f = floor(map(val, dmin,dmax,notes.length-1,0));
         group.play(notes[f])
     }
 
@@ -261,8 +281,6 @@ class Particle {
         this.pos.add(this.vel); 
         
     }
-
-    
 
     render() {
         fill(this.c, 100, 100);
@@ -281,18 +299,18 @@ function checkOverlap(p) {
                 //collision 
 
                 p.play();
-                p.vel.x = -1*p.vel.x; 
-                p.vel.y = -1*p.vel.y; 
-        
+                
                 let force = p5.Vector.sub(q.pos, p.pos);
                 let d = force.mag();
-                d = constrain(d, 1, 50);
+                d = constrain(d, 1, 100);
                 let G = 100;
                 let strength = G / (d * d);
                 force.setMag(strength);
-                force.mult(-5);
+                force.mult(-10);
                 let col = p5.Vector.sub(q.vel, p.vel);
                 p.collision.add(force);
+                p.vel.x = -1*p.vel.x; 
+                p.vel.y = -1*p.vel.y; 
                 
             }
         }
