@@ -13,6 +13,7 @@ const root = 60;
 let group;
 let baseTime = 500;
 let side; 
+let hsize; 
 
 
 
@@ -77,6 +78,8 @@ function setup() {
     playButton();
     frameRate(20);
     noStroke();
+    hsize = h-side*2;
+
 }
 
 function draw() {
@@ -191,7 +194,7 @@ class Group {
         this.start = frameCount;
 
         for (let i = 0; i < 6; i++) {
-            let pos = createVector(w/2 - 3*side + side/2 + i * side, side);
+            let pos = createVector(w/2 - 3*side + side/2 + i * side, side*0.75);
             let c = 60+55*i;
             let note = 100 - 12*i; 
             let vol = -2*(6-i*0.1); 
@@ -200,9 +203,9 @@ class Group {
 
         this.synths[0].active = false; 
       
-        this.faders.push(new NoteFader(createVector(w/2 - 3*side, side*2), this.notes[0]));
-        this.faders.push(new NoteFader(createVector(w/2 - side, side*2),this.notes[1]));
-        this.faders.push(new NoteFader(createVector(w/2 + side, side*2),this.notes[2]));
+        this.faders.push(new NoteFader(createVector(w/2 - 3*side, side*1.5), this.notes[0]));
+        this.faders.push(new NoteFader(createVector(w/2 - side, side*1.5),this.notes[1]));
+        this.faders.push(new NoteFader(createVector(w/2 + side, side*1.5),this.notes[2]));
 
 
     }
@@ -233,8 +236,8 @@ class Group {
     setFaderVal(index, y){
         let f = this.faders[index];
         let minval = 0; 
-        let maxval = side*5; 
-        let val = f.pos.y + side*5 - y; 
+        let maxval = hsize; 
+        let val = f.pos.y + hsize - y; 
         let note = floor(map(val, minval, maxval, 0, 12));
         f.setNote(note);
         this.notes[index]=note; 
@@ -261,9 +264,8 @@ class Group {
 
                         if(barnum == i){
                             fill(s.col, 0,100);
-
                         }
-                        rect(w/2 - 3*side + i*barLen, side*2 + (12-this.notes[i%3]-1)*(side*5/12)+j*(side*5/12)/6, barLen,(side*5/12)/6);
+                        rect(w/2 - 3*side + i*barLen, side*1.5 + (12-this.notes[i%3]-1)*(hsize/12)+j*(hsize/12)/6, barLen,(hsize/12)/6);
                     }
                 }
             }
@@ -315,20 +317,31 @@ class NoteFader{
     
     isClicked(m){
         let boolx = (m.x > this.pos.x && m.x < this.pos.x + side*2); 
-        let booly = (m.y > this.pos.y && m.y < this.pos.y + side*5);
+        let booly = (m.y > this.pos.y && m.y < this.pos.y + hsize);
         return (boolx && booly);  
     }
 
     display(){
+        noStroke();
+        fill(280,100,20); 
+        rect(this.pos.x, this.pos.y, side*2, hsize)
+
+        for(let i = 0; i<12; i++){
+            strokeWeight(1);
+            stroke(0,0,50);
+            line(this.pos.x, this.pos.y + i*hsize/12, this.pos.x+side*2,this.pos.y + i*hsize/12 ); 
+        }
+
         strokeWeight(5);
         stroke(300,100,100);
-        fill(280,100,20); 
-        rect(this.pos.x, this.pos.y, side*2, side*5)
+        noFill();
+        rect(this.pos.x, this.pos.y, side*2, hsize)
 
         noStroke();
         fill(300,50,100);
 //        stroke(0,0,100);
-        rect(this.pos.x, this.pos.y+(12-this.note-1)*(side*5/12), side*2, (side*5)/12);
+      
+        rect(this.pos.x, this.pos.y+(12-this.note-1)*(hsize/12), side*2, (hsize)/12);
 
     }
 }
