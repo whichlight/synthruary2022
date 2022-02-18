@@ -145,7 +145,7 @@ class Note {
         this.osc.envelope.sustain = 1;
         this.osc.envelope.release = 2;
         this.vol = vol;
-        this.osc.volume.value = -20;
+        this.osc.volume.value = this.vol;
         this.pitch = Tone.Frequency(this.root, "midi");
         this.pos = pos;
         this.r = side;
@@ -203,9 +203,6 @@ class Group {
         this.synths[0].active = false; 
       
         this.synths[5].active = false; 
-
-        //this.setVolume();
-
 
         this.faders.push(new NoteFader(createVector(w/2 - 3*side, side*2), this.notes[0]));
         this.faders.push(new NoteFader(createVector(w/2 - side, side*2),this.notes[1]));
@@ -277,10 +274,10 @@ class Group {
     }
 
     loop() {
-        this.setVolume();
+      //  this.setVolume();
         let t = floor(millis()); 
         this.synths.forEach((s) => { 
-            if ((frameCount - this.start) > 20 && frameCount % s.rate == 0 && s.active){
+            if ((frameCount - this.start) > 10 && frameCount % s.rate == 0 && s.active){
 
               // play next note 
               s.noteIndex += 1;
