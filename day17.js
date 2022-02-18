@@ -274,7 +274,7 @@ class Group {
     }
 
     loop() {
-      //  this.setVolume();
+        this.setVolume();
         let t = floor(millis()); 
         this.synths.forEach((s) => { 
             if ((frameCount - this.start) > 10 && frameCount % s.rate == 0 && s.active){
