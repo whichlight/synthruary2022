@@ -99,8 +99,6 @@ function synthRelease() {
             s.active = !s.active;
 
             if(s.active){
-
-
                 let index = group.getIndex(s);
                 s.setNote(s.root + group.notes[index]);
                 s.play(); 
@@ -137,10 +135,10 @@ class Note {
         this.root = note;
         this.note = note;
         this.toplay = [];
-        this.lowfilter = new Tone.Filter(1000, "lowpass").toDestination();
+        this.lowfilter = new Tone.Filter(600, "lowpass").toDestination();
         this.highfilter = new Tone.Filter(50, "highpass").connect(this.lowfilter);
         this.osc = new Tone.Synth().connect(this.highfilter);
-        this.osc.oscillator.type = "triangle";
+        this.osc.oscillator.type = "sawtooth";
         this.osc.envelope.decay = 1;
         this.osc.envelope.sustain = 1;
         this.osc.envelope.release = 2;
@@ -196,14 +194,12 @@ class Group {
             let pos = createVector(w/2 - 3*side + side/2 + i * side, side);
             let c = 60+55*i;
             let note = 100 - 12*i; 
-            let vol = -5*(6-i*0.1); 
+            let vol = -2*(6-i*0.1); 
             this.synths.push(new Note(3**i, pos, c,note, vol));
         }
 
         this.synths[0].active = false; 
       
-        this.synths[5].active = false; 
-
         this.faders.push(new NoteFader(createVector(w/2 - 3*side, side*2), this.notes[0]));
         this.faders.push(new NoteFader(createVector(w/2 - side, side*2),this.notes[1]));
         this.faders.push(new NoteFader(createVector(w/2 + side, side*2),this.notes[2]));
