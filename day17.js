@@ -44,7 +44,7 @@ function touchEnded() {
 function playButton() {
     push();
     translate(width * 0.5, height * 0.5);
-    fill(180, 100, 100);
+    fill(280, 100, 100);
     noStroke();
     polygon(0, 0, 50, 3);
     pop();
@@ -73,7 +73,7 @@ function setup() {
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
     setupSynths();
-    background(240, 100, 50, 100);
+    background(240, 50, 100);
     playButton();
     frameRate(20);
     noStroke();
@@ -81,7 +81,7 @@ function setup() {
 
 function draw() {
     if (contextStarted) {
-        background(240, 100, 50, 100);
+        background(240, 50, 100);
 
         group.loop();
 
@@ -99,7 +99,10 @@ function synthRelease() {
             s.active = !s.active;
 
             if(s.active){
-                s.setNote(s.root + group.notes[s.noteIndex]);
+
+
+                let index = group.getIndex(s);
+                s.setNote(s.root + group.notes[index]);
                 s.play(); 
             }
         }
@@ -108,6 +111,13 @@ function synthRelease() {
     group.faders.forEach((f,i) => {
         if (f.isClicked(createVector(mouseX, mouseY))) {
             group.setFaderVal(i,mouseY);
+
+            group.synths.forEach((s) => {
+                let index = group.getIndex(s);
+                s.setNote(s.root + group.notes[index]);
+                s.osc.frequency.value = s.pitch;
+
+            });
         }
     })
 }
@@ -169,7 +179,7 @@ class Note {
         noStroke();
         this.active
             ?   fill(this.col, 100, 100) 
-            :   fill(0, 0, 0);
+            :   fill(this.col, 100, 20);
         ellipse(this.pos.x, this.pos.y, this.r, this.r);
     }
 }
@@ -179,7 +189,7 @@ class Group {
         this.synths = [];
         this.faders = [];
         this.root = root; 
-        this.notes = [0,3,7];
+        this.notes = [7,5,0];
 
         for (let i = 0; i < 6; i++) {
             let pos = createVector(w/2 - 3*side + side/2 + i * side, side);
@@ -190,7 +200,6 @@ class Group {
         }
 
         this.synths[0].active = false; 
-        this.synths[1].active = false; 
         this.synths[5].active = false; 
 
         this.faders.push(new NoteFader(createVector(w/2 - 3*side, side*2), this.notes[0]));
@@ -198,6 +207,14 @@ class Group {
         this.faders.push(new NoteFader(createVector(w/2 + side, side*2),this.notes[2]));
 
 
+    }
+
+    getIndex(s){
+        let measureLen = 3**5; 
+        let beats = measureLen*3; 
+        let loopTime = frameCount % beats; 
+        let index = floor((loopTime / s.rate)%3); 
+        return index; 
     }
 
     setVolume() {
@@ -248,14 +265,15 @@ class Group {
                 let barLen = beatlen * s.rate; 
                 if (s.active){
                     for(let i=0; i<numBars; i++){
-                        fill(s.col, 100,50);
+                        noStroke();
+                        fill(s.col, 100,100);
 
                         let loopTime = frameCount % beats; 
                         let barnum = floor(loopTime / s.rate); 
                         let barnote = loopTime % s.rate; 
 
                         if(barnum == i){
-                            fill(s.col, 100,100);
+                            fill(s.col, 0,100);
 
                         }
                         rect(w/2 - 3*side + i*barLen, side*2 + (12-this.notes[i%3]-1)*(side*5/12)+j*(side*5/12)/6, barLen,(side*5/12)/6);
@@ -316,12 +334,13 @@ class NoteFader{
 
     display(){
         strokeWeight(5);
-        stroke(0,0,100);
-        fill(0,0,0); 
+        stroke(300,100,100);
+        fill(280,100,20); 
         rect(this.pos.x, this.pos.y, side*2, side*5)
 
         noStroke();
-        fill(0,0,50);
+        fill(300,50,100);
+//        stroke(0,0,100);
         rect(this.pos.x, this.pos.y+(12-this.note-1)*(side*5/12), side*2, (side*5)/12);
 
     }
