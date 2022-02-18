@@ -81,6 +81,8 @@ function setup() {
 
 function draw() {
     if (contextStarted) {
+        background(240, 100, 50, 100);
+
         group.loop();
 
     }
@@ -91,11 +93,15 @@ function synthOn() {
 }
 
 function synthRelease() {
-    group.release();
 
     group.synths.forEach((s) => {
         if (s.isClicked(createVector(mouseX, mouseY))) {
             s.active = !s.active;
+
+            if(s.active){
+                s.setNote(s.root + group.notes[s.noteIndex]);
+                s.play(); 
+            }
         }
     })
 
@@ -117,9 +123,9 @@ function setupSynths() {
 }
 
 class Note {
-    constructor(rate, pos) {
-        this.root = root;
-        this.note = root;
+    constructor(rate, pos, col, note, vol) {
+        this.root = note;
+        this.note = note;
         this.toplay = [];
         this.lowfilter = new Tone.Filter(1000, "lowpass").toDestination();
         this.highfilter = new Tone.Filter(50, "highpass").connect(this.lowfilter);
@@ -128,11 +134,12 @@ class Note {
         this.osc.envelope.decay = 1;
         this.osc.envelope.sustain = 1;
         this.osc.envelope.release = 2;
-        this.vol = -20;
+        this.vol = vol;
         this.osc.volume.value = this.vol;
         this.pitch = Tone.Frequency(this.root, "midi");
         this.pos = pos;
         this.r = side;
+        this.col = col; 
         this.start = millis();
         this.rate = rate;
         this.noteIndex = 0;
@@ -161,10 +168,9 @@ class Note {
     display() {
         noStroke();
         this.active
-            ?   fill(0, 0, 100) 
+            ?   fill(this.col, 100, 100) 
             :   fill(0, 0, 0);
         ellipse(this.pos.x, this.pos.y, this.r, this.r);
-
     }
 }
 
@@ -177,7 +183,10 @@ class Group {
 
         for (let i = 0; i < 6; i++) {
             let pos = createVector(w/2 - 3*side + side/2 + i * side, side);
-            this.synths.push(new Note(2**i, pos));
+            let c = 60+55*i;
+            let note = 100 - 12*i; 
+            let vol = -10*(6-i*0.4); 
+            this.synths.push(new Note(3**i, pos, c,note, vol));
         }
 
         this.synths[0].active = false; 
@@ -213,7 +222,7 @@ class Group {
     }
 
     release() {
-        this.synths.forEach((s) => { s.release(); });
+
     }
 
 
@@ -228,6 +237,33 @@ class Group {
         return note; 
     }
 
+    displayFaderBars(){
+
+        for(let j = 5; j >=0 ; j--){ 
+            let s = this.synths[j];
+                let measureLen = this.synths[this.synths.length-1].rate; 
+                let beats = measureLen*3; 
+                let beatlen = side*2*3/beats; 
+                let numBars = beats/s.rate;  
+                let barLen = beatlen * s.rate; 
+                if (s.active){
+                    for(let i=0; i<numBars; i++){
+                        fill(s.col, 100,50);
+
+                        let loopTime = frameCount % beats; 
+                        let barnum = floor(loopTime / s.rate); 
+                        let barnote = loopTime % s.rate; 
+
+                        if(barnum == i){
+                            fill(s.col, 100,100);
+
+                        }
+                        rect(w/2 - 3*side + i*barLen, side*2 + (12-this.notes[i%3]-1)*(side*5/12)+j*(side*5/12)/6, barLen,(side*5/12)/6);
+                    }
+                }
+            }
+    }
+
     loop() {
         this.setVolume();
         let t = floor(millis()); 
@@ -235,13 +271,19 @@ class Group {
             if (frameCount % s.rate == 0 && s.active){
 
               // play next note 
-              s.setNote(this.root + this.notes[s.noteIndex]);
               s.noteIndex += 1;
               s.noteIndex %= this.notes.length;
-              s.play();
 
+              let measureLen = 3**5; 
+              let beats = measureLen*3; 
+              let loopTime = frameCount % beats; 
+              let index = floor((loopTime / s.rate)%3); 
+
+              s.setNote(s.root + this.notes[index]);
+              s.play();
             }
 
+           
             s.display();
 
             if(!s.active){
@@ -252,6 +294,7 @@ class Group {
         this.faders.forEach((f)=>{
             f.display();
         });
+        this.displayFaderBars();
     }
 }
 
@@ -274,11 +317,11 @@ class NoteFader{
     display(){
         strokeWeight(5);
         stroke(0,0,100);
-        fill(300,100,100); 
+        fill(0,0,0); 
         rect(this.pos.x, this.pos.y, side*2, side*5)
 
         noStroke();
-        fill(60,100,100);
+        fill(0,0,50);
         rect(this.pos.x, this.pos.y+(12-this.note-1)*(side*5/12), side*2, (side*5)/12);
 
     }
