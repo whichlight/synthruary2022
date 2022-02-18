@@ -89,7 +89,7 @@ function draw() {
 }
 
 function synthOn() {
-    group.clicked(mouseX, mouseY);
+
 }
 
 function synthRelease() {
@@ -195,7 +195,7 @@ class Group {
             let pos = createVector(w/2 - 3*side + side/2 + i * side, side);
             let c = 60+55*i;
             let note = 100 - 12*i; 
-            let vol = -10*(6-i*0.4); 
+            let vol = -10*(6-i*0.1); 
             this.synths.push(new Note(3**i, pos, c,note, vol));
         }
 
@@ -230,17 +230,6 @@ class Group {
         });
     }
 
-    clicked(x, y) {
-
-    }
-
-    play() {
-        this.synths.forEach((s) => { s.play(); });
-    }
-
-    release() {
-
-    }
 
 
     setFaderVal(index, y){
