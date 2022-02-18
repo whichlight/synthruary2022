@@ -33,6 +33,7 @@ function touchEnded() {
 
     if (!contextStarted) {
         Tone.start();
+        setupSynths();
         let a = select('#instructions');
         a.remove();
         background(240, 100, 50, 100);
@@ -72,7 +73,6 @@ function setup() {
     side =  min(100, min(w, h) / 8);
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
-    setupSynths();
     background(240, 50, 100);
     playButton();
     frameRate(20);
@@ -145,7 +145,7 @@ class Note {
         this.osc.envelope.sustain = 1;
         this.osc.envelope.release = 2;
         this.vol = vol;
-        this.osc.volume.value = this.vol;
+        this.osc.volume.value = -20;
         this.pitch = Tone.Frequency(this.root, "midi");
         this.pos = pos;
         this.r = side;
@@ -190,17 +190,22 @@ class Group {
         this.faders = [];
         this.root = root; 
         this.notes = [7,5,0];
+        this.start = frameCount;
 
         for (let i = 0; i < 6; i++) {
             let pos = createVector(w/2 - 3*side + side/2 + i * side, side);
             let c = 60+55*i;
             let note = 100 - 12*i; 
-            let vol = -10*(6-i*0.1); 
+            let vol = -5*(6-i*0.1); 
             this.synths.push(new Note(3**i, pos, c,note, vol));
         }
 
         this.synths[0].active = false; 
+      
         this.synths[5].active = false; 
+
+        //this.setVolume();
+
 
         this.faders.push(new NoteFader(createVector(w/2 - 3*side, side*2), this.notes[0]));
         this.faders.push(new NoteFader(createVector(w/2 - side, side*2),this.notes[1]));
@@ -275,7 +280,7 @@ class Group {
         this.setVolume();
         let t = floor(millis()); 
         this.synths.forEach((s) => { 
-            if (frameCount % s.rate == 0 && s.active){
+            if ((frameCount - this.start) > 20 && frameCount % s.rate == 0 && s.active){
 
               // play next note 
               s.noteIndex += 1;
