@@ -43,7 +43,8 @@ function touchEnded() {
 function playButton() {
     push();
     translate(width * 0.5, height * 0.5);
-    fill(180, 100, 100);
+    fill(0, 0, 30);
+
     noStroke();
     polygon(0, 0, 50, 3);
     pop();
@@ -80,10 +81,14 @@ function setup() {
 function draw() {
     if (contextStarted) {
         background(0,100,100);
-        displayParams();
+        displayGrid();
+
         if (mouseIsPressed) {
             controls();
+            displayParams();
         }
+        
+    
        // waves();
 
     }
@@ -108,6 +113,29 @@ function waves() {
 
 }
 
+function displayGrid(){
+    strokeWeight(1);
+
+    for(let num = 0; num <8; num++){
+        for(let i = 0; i<num; i++){
+            let x = i*w/num; 
+            let y = i*h/num;
+            stroke(0,0,30,0.5);
+
+            line(x,0,x,h);
+            line(0,y,w,y);
+
+         }
+    }
+    
+
+    stroke(0,0,30,1);
+    line(0,0,w,h);
+    line(0,h,w,0);
+
+
+}
+
 function displayParams(){
     strokeWeight(2);
     let a = group.display_a; 
@@ -122,23 +150,21 @@ function displayParams(){
         vertex(x,y);
     }
     endShape();
-
-   
-
 }
 
 function controls() {
-    let x = map(mouseX, 0, w, 0.01, 40) ** 2;
-    let y = map(mouseY, 0, h, 0.01, 40) ** 2;
-    group.fm.osc.frequency.value = x;
-    group.fm2.osc.frequency.value = y;
-    group.synth.osc.frequency.value = y;
-    group.display_a = x; 
-    group.display_b = y;
+        let x = map(mouseX, 0, w, 0.01, 40) ** 2;
+        let y = map(mouseY, 0, h, 0.01, 40) ** 2;
+        group.fm.osc.frequency.value = x;
+        group.fm2.osc.frequency.value = y;
+        group.synth.osc.frequency.value = y;
+        group.display_a = (x); 
+        group.display_b = (y);
+   
 }
 
 function synthOn() {
-    group.clicked(mouseX, mouseY);
+    group.play();
 }
 
 function synthRelease() {
@@ -164,7 +190,7 @@ class Note {
         this.osc.oscillator.type = type;
         this.osc.envelope.decay = 1;
         this.osc.envelope.sustain = 1;
-        this.osc.envelope.release = 2;
+        this.osc.envelope.release = 0;
         this.osc.volume.value = -30;
         this.pitch = Tone.Frequency(this.root);
         this.pos = createVector(w / 2, h / 2);
@@ -178,7 +204,7 @@ class Note {
     }
 
     play() {
-        this.osc.triggerAttack(this.pitch, 1);
+        this.osc.triggerAttack(this.pitch, 0.5);
     }
 
     setNote(p) {
@@ -231,12 +257,7 @@ class Group {
         this.fft.toDestination();
         this.display_a = 100;
         this.display_b = 100; 
-
-
-
-
-        this.play();
-
+        this.active = false; 
 
     }
 
@@ -248,12 +269,15 @@ class Group {
         this.fm.play();
         this.fm2.play();
         this.synth.play();
+        this.active = true; 
 
     }
 
     release() {
-        //  this.fm.release();
-        // this.synth.release();
+          this.fm.release();
+          this.fm2.release();
+         this.synth.release();
+         this.active = false; 
 
     }
 
