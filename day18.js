@@ -34,7 +34,7 @@ function touchEnded() {
         Tone.start();
         let a = select('#instructions');
         a.remove();
-        background(240, 100, 50, 100);
+        background(0,100,100);
         contextStarted = true;
     }
     return false;
@@ -71,7 +71,7 @@ function setup() {
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
     setupSynths();
-    background(240, 100, 50, 100);
+    background(0,100,100);
     playButton();
     frameRate(50);
     noStroke();
@@ -214,6 +214,8 @@ class Group {
         this.fm2.osc.disconnect();
 
         this.fm2.osc.connect(this.synth.osc.frequency);
+     //   this.fm2.osc.connect(this.fm.osc.frequency);
+
         this.fm2.osc.volume.value = 50;
         this.fm2.osc.frequency.value = 100;
 
