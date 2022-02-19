@@ -84,8 +84,19 @@ function draw() {
         displayGrid();
 
         if (mouseIsPressed) {
+            if(!group.active){
+                group.active = true;
+              //  group.play();
+                group.synth.osc.volume.value = -30;
+            }
             controls();
             displayParams();
+        } else {
+            if(group.active){
+                //group.release();
+                group.synth.osc.volume.value = -100;
+                group.active = false; 
+            }
         }
         
     
@@ -164,11 +175,11 @@ function controls() {
 }
 
 function synthOn() {
-    group.play();
+    //group.play();
 }
 
 function synthRelease() {
-    group.release();
+   // group.release();
 }
 
 /*************************
@@ -188,6 +199,7 @@ class Note {
         this.highfilter = new Tone.Filter(0, "highpass").connect(this.lowfilter);
         this.osc = new Tone.Synth().connect(this.highfilter);
         this.osc.oscillator.type = type;
+        this.osc.envelope.attack = 0.01;
         this.osc.envelope.decay = 1;
         this.osc.envelope.sustain = 1;
         this.osc.envelope.release = 0;
@@ -258,6 +270,10 @@ class Group {
         this.display_a = 100;
         this.display_b = 100; 
         this.active = false; 
+        this.synth.osc.volume.value = -100;
+
+
+        this.play();
 
     }
 
@@ -269,7 +285,6 @@ class Group {
         this.fm.play();
         this.fm2.play();
         this.synth.play();
-        this.active = true; 
 
     }
 
@@ -277,7 +292,6 @@ class Group {
           this.fm.release();
           this.fm2.release();
          this.synth.release();
-         this.active = false; 
 
     }
 
