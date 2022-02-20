@@ -168,10 +168,8 @@ function controls() {
         let y = map(mouseY, 0, h, 0.01, 40) ** 2;
         group.fm.osc.frequency.value = x;
         group.fm2.osc.frequency.value = y;
-        group.synth.osc.frequency.value = y;
         group.display_a = (x); 
         group.display_b = (y);
-   
 }
 
 function synthOn() {
