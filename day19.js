@@ -319,7 +319,6 @@ class Group {
         if (mouseIsPressed && this.selected > -1) {
             let s = this.fms[this.selected];
             s.clickTime = millis();
-            s.highlight();
             s.pos.y = mouseY;
             s.update();
         }
