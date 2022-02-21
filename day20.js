@@ -43,7 +43,7 @@ function touchEnded() {
 function playButton() {
     push();
     translate(width * 0.5, height * 0.5);
-    fill(280, 100, 100);
+    fill(280, 20, 100);
     noStroke();
     polygon(0, 0, 50, 3);
     pop();
@@ -114,13 +114,17 @@ class Particle{
         this.pos = pos; 
         this.r = r; 
         this.c = 180; 
+        this.colormove = 1; 
         
     }
 
     update(){
         this.r++;
         this.pos.y++; 
-        this.c++; 
+      //  if(this.c>300) this.colormove =-1; 
+       // if(this.c<180) this.colormove =1; 
+
+        this.c+=this.colormove; 
         this.c%=360;
     }
 
