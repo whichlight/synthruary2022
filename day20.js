@@ -121,8 +121,8 @@ class Particle{
     update(){
         this.r++;
         this.pos.y++; 
-      //  if(this.c>300) this.colormove =-1; 
-       // if(this.c<180) this.colormove =1; 
+        if(this.c>300) this.colormove =-1; 
+        if(this.c<180) this.colormove =1; 
 
         this.c+=this.colormove; 
         this.c%=360;
