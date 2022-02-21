@@ -12,6 +12,7 @@ let w, h;
 const root = 70;
 let group;
 let notes = []; 
+let particles = [];
 
 
 /*************************
@@ -33,6 +34,7 @@ function touchEnded() {
         Tone.start();
         let a = select('#instructions');
         a.remove();
+        background(180, 100, 100, 100);
         contextStarted = true;
     }
     return false;
@@ -41,7 +43,7 @@ function touchEnded() {
 function playButton() {
     push();
     translate(width * 0.5, height * 0.5);
-    fill(180, 100, 100);
+    fill(280, 100, 100);
     noStroke();
     polygon(0, 0, 50, 3);
     pop();
@@ -69,7 +71,8 @@ function setup() {
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
     setupSynths();
-    background(0, 0, 0, 100);
+    background(180, 100, 100, 100);
+
     playButton();
     frameRate(20);
     noStroke();
@@ -77,27 +80,69 @@ function setup() {
 
 function draw() {
     if (contextStarted) {
-        background(0, 0, 0, 100);
 
         if(mouseIsPressed){
 
             group.pressed(mouseX,mouseY);
+
+                let pos = createVector(mouseX,mouseY); 
+                let r = map(mouseY, 0,h,5,200);
+                particles.push(new Particle(pos,r));
+            
     
         }
+
+        particles.forEach((p)=>{
+            p.update();
+            p.draw();
+
+
+            //remove element 
+            if(p.pos.y-(p.r/2)>h){
+                const index = particles.indexOf(p);
+                if (index > -1) {
+                    particles.splice(index, 1); 
+                  }
+            }
+        });
+
     }
 }
 
-function synthOn() {
+class Particle{
+    constructor(pos, r){
+        this.pos = pos; 
+        this.r = r; 
+        this.c = 180; 
+        
+    }
+
+    update(){
+        this.r++;
+        this.pos.y++; 
+        this.c++; 
+        this.c%=360;
+    }
+
+    draw(){
+        fill(this.c, 80,100);
+        ellipse(this.pos.x, this.pos.y, this.r, this.r);
+    }
+
+}
+
+
+/*************************
+ * synthy things 
+ *************************/
+
+ function synthOn() {
     group.pressed(mouseX, mouseY);
 }
 
 function synthRelease() {
     group.release();
 }
-
-/*************************
- * synthy things 
- *************************/
 
 function setupSynths() {
    
@@ -221,11 +266,10 @@ class Group {
         this.synths.forEach((s) => {
             s.setNote(p); 
             s.setQ(q);
-            s.setVol(volx+voly);
+            s.setVol(volx+voly-1*s.interval);
         
         });
         this.play();
-        console.log(volx, voly);
     }
 
     play() {
