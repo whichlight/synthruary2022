@@ -68,10 +68,10 @@ function polygon(x, y, radius, npoints) {
 function setup() {
     w = windowWidth;
     h = windowHeight;
-    colorMode(HSB, 360, 100, 100);
+    colorMode(HSB, 360, 100, 100, 100);
     createCanvas(w, h);
     setupSynths();
-    background(180, 100, 100, 100);
+    background(180, 100, 100);
 
     playButton();
     frameRate(20);
@@ -98,10 +98,11 @@ function draw() {
 
 
             //remove element 
-            if(p.pos.y-(p.r/2)>h){
+            if(p.alpha<=0){
                 const index = particles.indexOf(p);
                 if (index > -1) {
                     particles.splice(index, 1); 
+                    console.log(particles.length);
                   }
             }
         });
@@ -115,6 +116,7 @@ class Particle{
         this.r = r; 
         this.c = 180; 
         this.colormove = 1; 
+        this.alpha = 100; 
         
     }
 
@@ -124,12 +126,16 @@ class Particle{
         if(this.c>300) this.colormove =-1; 
         if(this.c<180) this.colormove =1; 
 
+        if(this.pos.y>h && this.alpha>0){
+            this.alpha--; 
+        }
+
         this.c+=this.colormove; 
         this.c%=360;
     }
 
     draw(){
-        fill(this.c, 80,100);
+        fill(this.c, 80,100, this.alpha);
         ellipse(this.pos.x, this.pos.y, this.r, this.r);
     }
 
