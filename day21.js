@@ -49,7 +49,7 @@ function touchEnded() {
 function playButton() {
     push();
     translate(width * 0.5, height * 0.5);
-    fill(280, 20, 100);
+    fill(280, 0, 50);
     noStroke();
     polygon(0, 0, 50, 3);
     pop();
@@ -122,13 +122,21 @@ function fillGrid() {
             if (diad == 0) c = 300;
 
             if (diad == 7) c = 120;
-            if (diad == 15) c = 160;
+            if (diad == 15) {
+                c = 200;
+                b = 50;
+            }
+
+            if(diad == 16){
+                c=240; 
+            
+            }
 
 
             if (diad == 9) c = 60;
             if (diad == 13) c = 30;
 
-            if (diad == 1) {
+            if (diad == 2) {
                 c = 1;
                 b = 40;
                 s = 50;
@@ -140,9 +148,26 @@ function fillGrid() {
                 b = 40;
             }
             if (diad == 18) {
-                c = 180;
-                s = 50;
-                b = 40;
+                c = 20;
+                s = 100;
+                b = 80;
+            }
+
+            if(diad==5){
+                c=280; 
+                s=50; 
+                b=40; 
+            }
+
+            if(diad==11){
+                c=1; 
+                s=100;
+                b=50;
+            }
+
+            if(diad==20){
+                c=280;
+                b=50;
             }
 
             if (c == -1) {
@@ -160,14 +185,15 @@ function fillGrid() {
 function drawGrid() {
     //draw notes
     //x 
+    stroke(0, 0, 0);
     for (let i = 0; i < notelen; i++) {
-        stroke(0, 0, 100);
+       
         line(i * xside, 0, i * xside, h);
     }
 
     //y
     for (let i = 0; i < notelen; i++) {
-        stroke(0, 0, 100);
+        
         line(0, i * yside, w, i * yside);
     }
 
@@ -315,6 +341,15 @@ class Group {
         fill(0, 0, 100, 0.4)
         rect((p - noteMin) * xside, 0, xside, h);
         rect(0, (q - noteMin)*yside, w, yside);
+
+        let i = (p-noteMin) % numNotes;
+        let j = (q-noteMin) % numNotes;
+        let k = min(i, j); 
+        i-=k;
+        j-=k;  
+        
+        let diad = max(i, j);
+       // console.log(diad);
 
 
         this.play();
