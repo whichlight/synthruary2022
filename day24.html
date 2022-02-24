@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./lib/p5.js"></script>
+    <script src="./day24.js"></script>
+    <script src="./lib/Tone.js"></script>
+
+    <title>day 24</title>
+    <style>
+     
+      body, canvas {
+        margin:0px;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        outline: none;
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
+        touch-action: none; 
+    }   
+    canvas{
+        position: absolute;
+        z-index:-1;
+    }
+
+    #instructions{
+        position: absolute; 
+        font-family:monospace;
+        margin:20px;
+        font-size:20px;
+        color:black;
+        
+    }
+      </style>
+  </head>
+  <body>
+    <main>
+        <div id="instructions">
+            <p><strong>Prompt: ASMR.</strong> This synth is made of a noise oscillator with a lowpass and highpass filter. 
+              Touch and drag on the screen. The lowpass filter opens up based on the speed at which you drag. 
+            </p>
+            <p> Tap the screen to start.</p>
+            
+        </div>
+    </main>
+  </body>
+</html>
