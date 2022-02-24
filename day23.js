@@ -305,15 +305,24 @@ class Group {
 
         this.fms.forEach((fm) => {
             fm.update()
-            fm.display()
+            if(!fm.playing){
+                fm.display()
+            }
+        });
+
+
+        this.fms.forEach((fm) => {
+            if(fm.playing){
+                fm.display()
+            }
         });
 
         if (mouseIsPressed && this.selected > -1) {
             let s = this.fms[this.selected];
             s.pos.y = mouseY;
             s.pos.x = mouseX;
-
             s.update();
+            s.display();
         }
 
        
