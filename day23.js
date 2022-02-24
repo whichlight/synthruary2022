@@ -11,7 +11,7 @@
 
 let contextStarted;
 let w, h;
-const root = 100;
+const root = 200;
 let group;
 let side;
 
@@ -44,7 +44,7 @@ function touchEnded() {
 function playButton() {
     push();
     translate(width * 0.5, height * 0.5);
-    fill(180, 100, 100);
+    fill(300, 100, 100);
 
     noStroke();
     polygon(0, 0, 50, 3);
@@ -72,7 +72,7 @@ function setup() {
     h = windowHeight;
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
-    background(240, 100, 100);
+    background(280, 100, 100);
     playButton();
     frameRate(30);
     noStroke();
@@ -82,15 +82,17 @@ function setup() {
 
 function draw() {
     if (contextStarted) {
-        background(240, 100, 100);
         group.loop();
     }
 }
 
 function synthOn() {
     group.selected = group.fms.findIndex((s) => s.isClicked(createVector(mouseX, mouseY)));
+    if (group.selected > -1) {
+
     let s = group.fms[group.selected];
     s.clickTime = millis(); 
+    }
 }
 
 function synthRelease() {
@@ -100,6 +102,9 @@ function synthRelease() {
         if (millis() - s.clickTime < 200 && s.isClicked(createVector(mouseX, mouseY))) {
             s.toggle(); 
         }
+    }
+    else{
+        group.synth.toggle();
     }
 
 }
@@ -126,17 +131,23 @@ class Note {
         this.highfilter = new Tone.Filter(0, "highpass").connect(this.lowfilter);
         this.osc = new Tone.Synth().connect(this.highfilter);
         this.osc.oscillator.type = type;
-        this.osc.envelope.attack = 0.01;
+        this.osc.envelope.attack = 0.1;
         this.osc.envelope.decay = 1;
         this.osc.envelope.sustain = 1;
-        this.osc.envelope.release = 0;
+        this.osc.envelope.release = 0.1;
         this.vol = 100;
         this.osc.volume.value = this.vol;
         this.pitch = Tone.Frequency(this.root);
+        this.playing = true; 
+    }
+
+    toggle() {
+        this.playing = !this.playing;
+        this.playing ? this.play() : this.release(); 
     }
 
     play() {
-        this.osc.triggerAttack(this.pitch, 0.5);
+        this.osc.triggerAttack(this.pitch,0.1);
     }
     release() {
         this.osc.triggerRelease();
@@ -187,7 +198,6 @@ class FMNote {
         let x = map(this.pos.x, 0, w, -20, 100) ;
         this.osc.volume.value = x;
         if(this.playing) console.log(x,y);
-
         
     }
 
@@ -195,7 +205,7 @@ class FMNote {
 
     display() {
         if (this.playing) {
-            let c = 300;
+            let c = 180;
             let arr = this.analyser.getValue();
             let y = arr[0];
             let b = map(y, -1, 1, 100, 0);
@@ -243,30 +253,32 @@ class Group {
         this.fms = [];
         this.selected = -1;
 
-        let num = 7;
+        let num = 5;
         let fmamp = 0;
+        this.synth.play(); 
+
+        let types = ["sawtooth", "pulse", "sine"]; 
+        let typeIndex = 0; 
 
         for (let i = 0; i < num; i++) {
-            let fm = new FMNote(createVector((w - ((num - 1) * (side))) / 2 + i * side, h - side), fmamp);
-            fm.osc.connect(this.synth.osc.frequency);
-            fm.osc.volume.value = fmamp;
-            this.fms.push(fm);
+            for(let j = 0; j < 3; j++){
+                let fm = new FMNote(createVector( (w - ((3-1)* (side)))/2 + j*side, (h - ((num - 1) * (side))) / 2 + i * side), fmamp);
+                fm.osc.connect(this.synth.osc.frequency);
+                fm.osc.volume.value = fmamp;
+                fm.osc.oscillator.type = types[j];
+                this.fms.push(fm);
+            }
+           
         }
 
+        /*
         this.fms[0].osc.oscillator.type = "sawtooth";
         this.fms[1].osc.oscillator.type = "sawtooth";
         this.fms[2].osc.oscillator.type = "pulse";
         this.fms[3].osc.oscillator.type = "pulse";
+        */
 
-
-
-
-        this.analyser = new Tone.Analyser('waveform');
-        this.synth.comp.connect(this.analyser);
-        this.analyser.toDestination();
-        this.play()
-        this.active = true;
-
+        this.synth.comp.toDestination();
     }
 
     clicked(x, y) {
@@ -286,6 +298,11 @@ class Group {
 
     loop() {
 
+        let bg; 
+        this.synth.playing ? bg = 100 : bg = 50; 
+        fill(280, 100,bg);
+        rect(w/2, h/2, w, h);
+
         this.fms.forEach((fm) => {
             fm.update()
             fm.display()
@@ -299,22 +316,7 @@ class Group {
             s.update();
         }
 
-        let allInactive = true; 
-        this.fms.forEach((fm)=>{
-            if(fm.playing){
-                allInactive = false;
-            }
-        });
-
-        if(allInactive && group.active){
-            this.synth.release(); 
-            group.active = false; 
-        }
-
-        if(!allInactive && !group.active){
-            this.synth.play();
-            group.active = true; 
-        }
+       
         
 
       
