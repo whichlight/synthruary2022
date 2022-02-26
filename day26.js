@@ -70,10 +70,11 @@ function setup() {
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
     setupSynths();
+    background(0, 0, 0, 100);
+
     playButton();
     frameRate(20);
     noStroke();
-    background(0, 0, 0, 100);
 
     rectMode(CENTER);
 }
