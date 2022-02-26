@@ -82,44 +82,49 @@ function setup() {
 function draw() {
     if (contextStarted) {
         background(0,0,0,0.1);
+ 
+        stroke(0,0,100,0.1);
+        line(w/3, 0, w/3, h); 
+
+
+        stroke(0,0,100,0.1);
+        line(2*w/3, 0, 2*w/3, h); 
 
         if(mouseIsPressed){
-            let p = quantize(map(mouseY,0,h, 70, 50));
-            p = constrain(p,50,70);
-            let r = map(p, 50, 70, 100, 300);
-            let t = floor(map(mouseX, 0, w, 0,3));
-            let c = map(p%12, 0, 11, 0, 300); 
-            t = constrain(t, 0, 2);
-            console.log(t);
-            group.synths[0].osc.oscillator.type = types[t];
-            group.synths[0].setNote(p);
-           
-            fill(c,100,100);
-
-            push(); 
-            translate(mouseX,mouseY); 
-            strokeWeight(5);
-            stroke(c,50,100);
-            if(t==0) ellipse(0, 0, r,r);
-            if(t==1) {
-                rotate(-PI/2);
-                polygon(0, 0, r/2,3);
-            }
-            if(t==2) rect(0, 0, r,r);
-
-            pop(); 
-
-
-
-            
+            controls();
         }
-      
-     
-
     }
 }
 
+function controls(){
+    let p = quantize(map(mouseY,0,h, 70, 50));
+    p = constrain(p,50,70);
+    let r = map(p, 50, 70, 100, 300);
+    let t = floor(map(mouseX, 0, w, 0,3));
+    let c = map(p%12, 0, 11, 0, 300); 
+    t = constrain(t, 0, 2);
+    console.log(t);
+    group.synths[0].osc.oscillator.type = types[t];
+    group.synths[0].setNote(p);
+   
+    fill(c,100,100);
+
+    push(); 
+    translate(mouseX,mouseY); 
+    strokeWeight(5);
+    stroke(c,50,100);
+    if(t==0) ellipse(0, 0, r,r);
+    if(t==1) {
+        rotate(-PI/2);
+        polygon(0, 0, r/2,3);
+    }
+    if(t==2) rect(0, 0, r,r);
+    pop(); 
+
+}
+
 function synthOn() {
+    controls();
     group.clicked(mouseX, mouseY);
 }
 
