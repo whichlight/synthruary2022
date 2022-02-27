@@ -102,14 +102,14 @@ function draw() {
                                 fill(c, 100,100,0.1);
 
                                 let s = w/4; 
-                                rect((k-1)*s, 0, s, h/3); 
+                                rect((k-1)*s, 0, s, h/4); 
 
                                  s = w/20;
-                                rect(i*s, h/3, s, h/3); 
+                                rect(i*s, h/4, s, h/4); 
 
 
                                  s = w/numSynths;
-                                rect(j*s, 2*h/3, s, h/3); 
+                                rect(j*s, h/2, s, h/2); 
 
     
                             }

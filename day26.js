@@ -70,7 +70,7 @@ function setup() {
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
     setupSynths();
-    background(0, 0, 0, 100);
+    background(300,100,100);
 
     playButton();
     frameRate(20);
@@ -83,17 +83,39 @@ function setup() {
 
 function draw() {
     if (contextStarted) {
-        background(0,0,0,0.1);
+        background(300,100,100);
  
         stroke(0,0,100,0.1);
         line(w/3, 0, w/3, h); 
 
-
         stroke(0,0,100,0.1);
         line(2*w/3, 0, 2*w/3, h); 
 
+
+        //head 
+        let s = min(w,h)*0.75;
+        fill(0,0,50);
+        rect(w/2,h/2,s,s);
+
+     
+
+
         if(mouseIsPressed){
             controls();
+               //eyes
+             noStroke();
+             fill(0,0,0);
+             rect(w/2-s/4, h/2-s/4, s/10, s/50);
+             rect(w/2+s/4, h/2-s/4, s/10, s/50);
+        } else{
+            fill(0,0,0);
+            rect(w/2,h*0.55, s/2+s/16, min(w,h)/20);
+
+            fill(0,0,0);
+            noStroke();
+            rect(w/2-s/4, h/2-s/4, s/10, s/10);
+            rect(w/2+s/4, h/2-s/4, s/10, s/10);
+           
         }
     }
 }
@@ -101,21 +123,28 @@ function draw() {
 function controls(){
     let p = quantize(map(mouseY,0,h, 70, 50));
     p = constrain(p,50,70);
-    let r = map(p, 50, 70, 100, 300);
+    let r = map(p, 50, 70, 100, min(w,h)*0.4);
     let t = floor(map(mouseX, 0, w, 0,3));
     let c = map(p%12, 0, 11, 0, 300); 
     t = constrain(t, 0, 2);
     group.synths[0].osc.oscillator.type = types[t];
     group.synths[0].setNote(p);
    
+    fill(0,0,100);
+
+    let s = min(w,h)*0.75;
     fill(c,100,100);
+    rect(w/2,h/2,s,s);
+
 
     push(); 
-    translate(mouseX,mouseY); 
-    stroke(c,50,100);
+    translate(w/2,0.55*h); 
+    noStroke();
+    fill(0,0,0);
+
     if(t==0) ellipse(0, 0, r,r);
     if(t==1) {
-        rotate(-PI/2);
+        rotate(PI/2);
         polygon(0, 0, r/2,3);
     }
     if(t==2) rect(0, 0, r,r);
