@@ -75,6 +75,8 @@ function setup() {
     playButton();
     frameRate(20);
     noStroke();
+    strokeWeight(5);
+
 
     rectMode(CENTER);
 }
@@ -110,7 +112,6 @@ function controls(){
 
     push(); 
     translate(mouseX,mouseY); 
-    strokeWeight(5);
     stroke(c,50,100);
     if(t==0) ellipse(0, 0, r,r);
     if(t==1) {
