@@ -75,7 +75,6 @@ function setup() {
     playButton();
     frameRate(20);
     noStroke();
-    strokeWeight(5);
 
 
     rectMode(CENTER);
@@ -84,12 +83,6 @@ function setup() {
 function draw() {
     if (contextStarted) {
         background(300,100,100);
- 
-        stroke(0,0,100,0.1);
-        line(w/3, 0, w/3, h); 
-
-        stroke(0,0,100,0.1);
-        line(2*w/3, 0, 2*w/3, h); 
 
 
         //head 
@@ -103,7 +96,6 @@ function draw() {
         if(mouseIsPressed){
             controls();
                //eyes
-             noStroke();
              fill(0,0,0);
              rect(w/2-s/4, h/2-s/4, s/10, s/50);
              rect(w/2+s/4, h/2-s/4, s/10, s/50);
@@ -112,7 +104,6 @@ function draw() {
             rect(w/2,h*0.55, s/2+s/16, min(w,h)/20);
 
             fill(0,0,0);
-            noStroke();
             rect(w/2-s/4, h/2-s/4, s/10, s/10);
             rect(w/2+s/4, h/2-s/4, s/10, s/10);
            
@@ -139,7 +130,6 @@ function controls(){
 
     push(); 
     translate(w/2,0.55*h); 
-    noStroke();
     fill(0,0,0);
 
     if(t==0) ellipse(0, 0, r,r);
