@@ -34,7 +34,7 @@ function touchEnded() {
         Tone.start();
         let a = select('#instructions');
         a.remove();
-        background(240, 100, 50, 100);
+        background(60, 50, 100, 100);
         contextStarted = true;
     }
     return false;
@@ -71,7 +71,7 @@ function setup() {
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
     setupSynths();
-    background(240, 100, 50, 100);
+    background(60, 50, 100, 100);
     playButton();
     frameRate(20);
     noStroke();
@@ -79,13 +79,13 @@ function setup() {
 
 function draw() {
     if (contextStarted) {
+        background(0,0,100,0.1);
         if (mouseIsPressed) {
 
             let x= floor(map(mouseX, 0, w, 10,1));
             let y = floor(map(mouseY, 0, h, 9, 2));
 
             for (let k = 1; k < 5; k ++) {
-                //for (let l = 0; l < y; l++) {
                     for (let i = 0; i < 20; i++) {
                         for (let j = 0; j < numSynths; j++) {
                             let r = x*(i+j+k);
@@ -93,17 +93,32 @@ function draw() {
                                 let p = quantize(root +i+y*j);
                                 group.synths[j].setNote(p);
                                 group.synths[j].play(); 
-                                group.draw();
+                              //  group.draw();
+
+                                //draw 
+                                strokeWeight(2);
+                                stroke(0,0,100,0.1);
+                                let c = map(group.synths[j].note, 50,100, 0, 180);
+                                fill(c, 100,100,0.1);
+
+                                let s = w/4; 
+                                rect((k-1)*s, 0, s, h/3); 
+
+                                 s = w/20;
+                                rect(i*s, h/3, s, h/3); 
+
+
+                                 s = w/numSynths;
+                                rect(j*s, 2*h/3, s, h/3); 
 
     
                             }
                         }
                     }
-               // }
             }
         }
     }
-}
+} 
 
 function setupQuantize() {
     notes = [];

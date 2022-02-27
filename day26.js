@@ -103,7 +103,6 @@ function controls(){
     let t = floor(map(mouseX, 0, w, 0,3));
     let c = map(p%12, 0, 11, 0, 300); 
     t = constrain(t, 0, 2);
-    console.log(t);
     group.synths[0].osc.oscillator.type = types[t];
     group.synths[0].setNote(p);
    
