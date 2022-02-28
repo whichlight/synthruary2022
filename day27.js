@@ -81,13 +81,14 @@ function setup() {
 
 function draw() {
     if (contextStarted) {
-        group.loop(); 
         
         if(mouseIsPressed){
            // let w = map(mouseY,0,h,0,1);
             warpVal+=0.001;
             group.setWarp(warpVal);
         }
+        group.loop(); 
+
 
     }
 }
