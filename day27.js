@@ -34,7 +34,7 @@ function touchEnded() {
         Tone.start();
         let a = select('#instructions');
         a.remove();
-        background(60, 100, 50, 100);
+        background(180, 100, 50, 100);
         contextStarted = true;
     }
     return false;
@@ -71,7 +71,7 @@ function setup() {
     colorMode(HSB, 360, 100, 100);
     createCanvas(w, h);
     setupSynths();
-    background(60, 100, 50, 100);
+    background(180, 100, 50, 100);
     playButton();
     frameRate(20);
     noStroke();
@@ -84,7 +84,7 @@ function draw() {
         
         if(mouseIsPressed){
            // let w = map(mouseY,0,h,0,1);
-            warpVal+=0.001;
+            warpVal+=1;
             group.setWarp(warpVal);
         }
         group.loop(); 
@@ -197,8 +197,8 @@ class Group {
 
     setWarp(w){
         this.warp = w; 
-        this.frameRate= map(this.warp, 0,1, 1, 0.25);
-        this.lfo.volume.value = map(this.warp,0,1,5,25);
+        this.frameRate= map(this.warp, 0,1000, 1, 0.25);
+        this.lfo.volume.value = map(this.warp,0,1000,5,25);
 
     }
 
@@ -219,12 +219,12 @@ class Group {
     }
 
     draw(){
-        let y = this.warp*h;
+        let y = this.warp*h/1000;
 
         fill(240,100,50, 0.2);
         rect(0,0,w,y);
 
-        fill(60,100,(1-this.warp)*100, 0.2);
+        fill(180,100,(1-this.warp/1000)*100, 0.2);
         rect(0,y,w,h-y);
 
 
@@ -232,9 +232,9 @@ class Group {
             let y = map(s.note, -1, 13, 0, h); 
             let r = min(w,h)/4;
 
-            fill(180,100,100,0.05);
+            fill(60,100,100,0.05);
             for(let j = 0; j<20; j++){
-                let d = (this.warp)*(j*5);
+                let d = (this.warp/1000)*(j*5);
                 ellipse(w/4+i*w/4, y+d, r, r);
             }
         })
