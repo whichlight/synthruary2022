@@ -173,8 +173,8 @@ class Group {
         let inotes = [0,7, 12];
         this.lfo = new Tone.Synth();
         this.lfo.oscillator.type = "sine";
-        this.lfo.frequency.value = 0.25;
-        this.lfo.triggerAttack(100,0.1);
+        this.lfo.triggerAttack(0.25,0.1);
+      //  this.lfo.frequency.value = 0.25;
 
         
         for(let i = 0; i<3; i++){
@@ -192,7 +192,7 @@ class Group {
         //update these two params with melting time 
         this.lfo.volume.value = 0; //0 to 30, amt of waviness
         this.frameRate = 1.5; // speed of loop  .25-2
-        this.warp = 0; 
+        this.warp = 0;
     }
 
     setWarp(w){
