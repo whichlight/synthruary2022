@@ -1,0 +1,54 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./lib/p5.js"></script>
+    <script src="./day28.js"></script>
+    <script src="./lib/Tone.js"></script>
+
+    <title>day 15</title>
+    <style>
+     
+      body, canvas {
+        margin:0px;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        outline: none;
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
+        touch-action: none; 
+    }   
+    canvas{
+        position: absolute;
+        z-index:-1;
+    }
+
+    #instructions{
+        position: absolute; 
+        font-family:monospace;
+        margin:20px;
+        font-size:20px;
+        color:yellow;
+        
+    }
+      </style>
+  </head>
+  <body>
+    <main>
+        <div id="instructions">
+            <p><strong>Prompt: Natural/Organic.</strong> This synth expands on 
+              the day 23 birdsong prompt and is made up of a series of 
+              oscillators with lfos modulating the pitch, simulating a flock of birds singing. 
+              To celebrate the completion of synthruary :) Left to right changes the rate, 
+              bottom to top changes the filter cutoff. 
+              The particlar bird calls, i.e. the lfo parameters for each oscillator, 
+              are uniquely set every time the synth is refreshed. 
+            </p>
+            <p> Tap the screen to start.</p>
+            
+        </div>
+    </main>
+  </body>
+</html>
