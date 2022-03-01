@@ -86,7 +86,7 @@ function draw() {
             gr = constrain(gr, 0, 7);
 
             gf = map(mouseY, 0, h, 8000, 0);
-            gf = constrain(gf, 8000,0);
+            gf = constrain(gf, 0,8000);
 
             let bc = map(mouseY, 0,h, 0, 100); 
             let bb = map(mouseY, 0,h, 50, 0); 
